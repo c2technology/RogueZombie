@@ -18,7 +18,7 @@ import net.c2technology.roguezombie.world.World;
 public class Zombie extends AbstractCreature {
 
     public Zombie(World world, char glyph, Color color, ZombieAi ai) {
-        super(world, glyph, color, ai, CreatureType.MOB);
+        super(CreatureType.MOB, glyph, glyph, color, ai, world);
     }
 
     @Override
@@ -49,4 +49,5 @@ public class Zombie extends AbstractCreature {
     public void attack(Creature other) {
         getAi().attack(this, other);
     }
+
 }

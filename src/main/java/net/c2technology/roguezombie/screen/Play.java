@@ -6,13 +6,16 @@
 package net.c2technology.roguezombie.screen;
 
 import asciiPanel.AsciiPanel;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
+import net.c2technology.roguezombie.creature.CreatureFactory;
 import net.c2technology.roguezombie.creature.Player;
 import net.c2technology.roguezombie.world.Cardinal;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.Entity;
 import net.c2technology.roguezombie.world.World;
 import net.c2technology.roguezombie.world.WorldBuilder;
+import net.c2technology.roguezombie.world.los.FieldOfView;
 
 /**
  *
@@ -23,11 +26,20 @@ public class Play implements Screen {
     private final World world;
     private final int screenWidth;
     private final int screenHeight;
+    private final FieldOfView fieldOfView;
+    private final CreatureFactory creatureFactory;
+    private final Player player;
 
     public Play() {
         this.screenWidth = 80;
         this.screenHeight = 21;
+
+        creatureFactory = new CreatureFactory();
+
         world = createWorld();
+        fieldOfView = new FieldOfView(world);
+        player = creatureFactory.makePlayer(world, fieldOfView);
+        player.setCoordinate(world.getRandomSpawnableLocation());
 
     }
 
@@ -36,8 +48,8 @@ public class Play implements Screen {
     }
 
     public Coordinate getScrollCoordinate() {
-        int x = Math.max(0, Math.min(world.getPlayer().getCoordinate().getX() - screenWidth / 2, world.getWidth() - screenWidth));
-        int y = Math.max(0, Math.min(world.getPlayer().getCoordinate().getY() - screenHeight / 2, world.getHeight() - screenHeight));
+        int x = Math.max(0, Math.min(player.getCoordinate().getX() - screenWidth / 2, world.getWidth() - screenWidth));
+        int y = Math.max(0, Math.min(player.getCoordinate().getY() - screenHeight / 2, world.getHeight() - screenHeight));
         return new Coordinate(x, y);
     }
 
@@ -52,8 +64,18 @@ public class Play implements Screen {
         for (int x = 0; x < screenWidth; x++) {
             for (int y = 0; y < screenHeight; y++) {
                 Coordinate coordinate = new Coordinate(x + topLeft.getX(), y + topLeft.getY());
-                Entity entity = world.getEntity(coordinate);
-                context.write(entity.getGlyph(), x, y, entity.getColor());
+                Entity entity;
+                Color color;
+                if (player.canSee(coordinate)) {
+                    //Get the creature or tile, whatever is there..
+                    entity = world.getEntity(coordinate);
+                    color = entity.getColor();
+                } else {
+                    //Get the last remembered tile and fade it out..
+                    entity = fieldOfView.getRememberedTile(coordinate);
+                    color = Color.DARK_GRAY;
+                }
+                context.write(entity.getGlyph(), x, y, color);
             }
         }
     }
@@ -62,9 +84,10 @@ public class Play implements Screen {
     public void display(AsciiPanel terminal) {
         terminal.write("You are having fun.", 1, 1);
         Coordinate upperLeftPosition = getScrollCoordinate();
-        displayWorld(terminal, upperLeftPosition);
-        Player player = world.getPlayer();
         Coordinate playerCoordinate = player.getCoordinate();
+        fieldOfView.update(playerCoordinate, player.getVisionRadius());
+        displayWorld(terminal, upperLeftPosition);
+
         terminal.write(player.getGlyph(), playerCoordinate.getX() - upperLeftPosition.getX(), playerCoordinate.getY() - upperLeftPosition.getY(), player.getColor());
         terminal.writeCenter("X: " + playerCoordinate.getX(), 21);
         terminal.writeCenter("Y: " + playerCoordinate.getY(), 22);
@@ -120,7 +143,7 @@ public class Play implements Screen {
                 cardinal = Cardinal.NONE;
                 break;
         }
-        world.movePlayer(cardinal);
+        world.move(player, cardinal);
         world.endTurn();
 
         return this;

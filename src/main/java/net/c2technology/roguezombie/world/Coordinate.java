@@ -30,7 +30,14 @@ public class Coordinate {
     @Override
     public String toString() {
         return String.format("X: %s, Y: %s", x, y);
+    }
 
+    public int horizontalDelta(Coordinate coordinate) {
+        return coordinate.x - this.x;
+    }
+
+    public int verticalDelta(Coordinate coordinate) {
+        return coordinate.y - this.y;
     }
 
 }

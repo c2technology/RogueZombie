@@ -14,16 +14,19 @@ import java.awt.Color;
  */
 public enum Tile implements Entity {
 
-    FLOOR((char) 250, AsciiPanel.yellow),
-    WALL((char) 177, AsciiPanel.yellow),
-    BOUNDS('x', AsciiPanel.brightBlack);
+    FLOOR((char) 250, AsciiPanel.yellow, true),
+    WALL((char) 177, AsciiPanel.yellow, false),
+    UNDISCOVERED(' ', AsciiPanel.black, true),
+    BOUNDS('x', AsciiPanel.brightBlack, false);
 
     private final char glyph;
     private final Color color;
+    private final boolean passable;
 
-    private Tile(char glyph, Color color) {
+    private Tile(char glyph, Color color, boolean passable) {
         this.glyph = glyph;
         this.color = color;
+        this.passable = passable;
     }
 
     @Override
@@ -38,6 +41,6 @@ public enum Tile implements Entity {
 
     @Override
     public boolean isPassable() {
-        return this != Tile.BOUNDS && this != Tile.WALL;
+        return passable;
     }
 }

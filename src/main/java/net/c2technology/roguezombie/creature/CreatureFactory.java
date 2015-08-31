@@ -7,11 +7,15 @@ package net.c2technology.roguezombie.creature;
 
 import net.c2technology.roguezombie.creature.ai.PlayerAi;
 import net.c2technology.roguezombie.creature.ai.Creature;
-import net.c2technology.roguezombie.creature.ai.DumbZombieAi;
+//import net.c2technology.roguezombie.creature.ai.DumbZombieAi;
 import asciiPanel.AsciiPanel;
+import net.c2technology.roguezombie.creature.ai.DumbZombieAi;
 import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
 import net.c2technology.roguezombie.creature.ai.ZombieAi;
+//import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
+//import net.c2technology.roguezombie.creature.ai.ZombieAi;
 import net.c2technology.roguezombie.world.World;
+import net.c2technology.roguezombie.world.los.FieldOfView;
 
 /**
  *
@@ -23,9 +27,9 @@ public class CreatureFactory {
 
     }
 
-    public Player makePlayer(World world) {
-        PlayerAi playerAi = new PlayerAi();
-        Player player = new Player(world, '@', AsciiPanel.brightWhite, playerAi);
+    public Player makePlayer(World world, FieldOfView fieldOfView) {
+        PlayerAi playerAi = new PlayerAi(fieldOfView);
+        Player player = new Player(world, '@', AsciiPanel.brightWhite, playerAi, 2);
         return player;
     }
 

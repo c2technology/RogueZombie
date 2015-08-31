@@ -18,8 +18,8 @@ import net.c2technology.roguezombie.world.World;
 public class Player extends AbstractCreature {
 
     //TODO: Implement changeable AI for added effects (poison, confused, etc)..
-    public Player(World world, char glyph, Color color, PlayerAi ai) {
-        super(world, glyph, color, ai, CreatureType.PLAYER);
+    public Player(World world, char glyph, Color color, PlayerAi ai, int visionRadius) {
+        super(CreatureType.PLAYER, visionRadius, glyph, color, ai, world);
     }
 
     /**
@@ -42,4 +42,5 @@ public class Player extends AbstractCreature {
         //TODO: Check if they are dead
         //TODO: ???
     }
+
 }

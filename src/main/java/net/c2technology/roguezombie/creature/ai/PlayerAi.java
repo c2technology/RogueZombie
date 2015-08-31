@@ -6,6 +6,8 @@
 package net.c2technology.roguezombie.creature.ai;
 
 import net.c2technology.roguezombie.creature.Player;
+import net.c2technology.roguezombie.world.Coordinate;
+import net.c2technology.roguezombie.world.los.FieldOfView;
 
 /**
  *
@@ -13,14 +15,29 @@ import net.c2technology.roguezombie.creature.Player;
  */
 public class PlayerAi extends AbstractCreatureAi<Player> {
 
-    public PlayerAi() {
+    private final FieldOfView fieldOfView;
 
+    public PlayerAi(FieldOfView fieldOfView) {
+        this.fieldOfView = fieldOfView;
     }
 
     @Override
     public void resolveTurn(Player me) {
         //TODO: Check if they are dead
         //TODO: ???
+    }
+
+    /**
+     * The player's Field of View is used when determining if the target can be
+     * seen.
+     *
+     * @param me
+     * @param target
+     * @return
+     */
+    @Override
+    public boolean canSee(Player me, Coordinate target) {
+        return fieldOfView.isVisible(target);
     }
 
 }

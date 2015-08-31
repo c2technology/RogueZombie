@@ -12,13 +12,11 @@ import java.util.Map;
 import java.util.UUID;
 import net.c2technology.roguezombie.creature.ai.Creature;
 import net.c2technology.roguezombie.creature.CreatureFactory;
-import net.c2technology.roguezombie.creature.Player;
 import squidpony.squidmath.RNG;
 
 /**
- * A {@code World} handles all state manipulation of it's denizens. This is
- * currently limited to all non-player {@code Creature} and {@code Tile}
- * objects.
+ * A {@code World} handles all state manipulation of it's denizens and utilizes
+ * all mechanics within.
  *
  * @author cryan
  */
@@ -29,8 +27,6 @@ public class World {
     private final int height;
     private final UUID[][] creatureLocator;
     private final Map<UUID, Creature> creatureRegistry;
-    private final Player player;
-    private final CreatureFactory creatureFactory;
 
     /**
      * Creates a new {@code World} with the given {@code tiles} as the terrain.
@@ -48,10 +44,7 @@ public class World {
         }
         this.creatureLocator = new UUID[width][height];
         this.creatureRegistry = new HashMap();
-        creatureFactory = new CreatureFactory();
-        player = makePlayer();
-        player.setCoordinate(getRandomSpawnableLocation());
-        createCreatures(creatureFactory);
+
     }
 
     /**
@@ -250,12 +243,13 @@ public class World {
     }
 
     /**
-     * Tells a player where to move.
+     * Moves a {@code creature} within the world in the given {@code direction}.
      *
-     * @param cardinal
+     * @param creature
+     * @param direction
      */
-    public void movePlayer(Cardinal cardinal) {
-        player.move(cardinal);
+    public void move(Creature creature, Cardinal direction) {
+        creature.move(direction);
     }
 
     /**
@@ -268,10 +262,6 @@ public class World {
         Coordinate newCoordinate = creature.getCoordinate();
         creatureLocator[oldCoordinate.getX()][oldCoordinate.getY()] = null;
         creatureLocator[newCoordinate.getX()][newCoordinate.getY()] = creature.getId();
-    }
-
-    public Player getPlayer() {
-        return player;
     }
 
     /**
@@ -299,10 +289,6 @@ public class World {
             creature.setCoordinate(getRandomSpawnableLocation());
             addCreature(creature);
         }
-    }
-
-    private Player makePlayer() {
-        return creatureFactory.makePlayer(this);
     }
 
     public Collection<Creature> getCreatures() {
@@ -352,12 +338,18 @@ public class World {
         try {
             Coordinate coord = getSpawnableLocation(creature.getCoordinate());
             creature.setCoordinate(coord);
+            //TODO: Determine better method for this
             creatureRegistry.put(creature.getId(), creature);
             creatureLocator[creature.getCoordinate().getX()][creature.getCoordinate().getY()] = creature.getId();
         } catch (UnspawnableException e) {
             System.out.println("Could not spawn creature at " + creature.getCoordinate().toString());
         }
+    }
 
+    public boolean isInBounds(Coordinate target) {
+        int x = target.getX();
+        int y = target.getY();
+        return (x >= 0 && x < width) && (y >= 0 && y < height);
     }
 
 }

@@ -40,9 +40,9 @@ public class SmartZombieAi extends DumbZombieAi {
     @Override
     protected void move(Zombie me) {
         if (senseHumans(me)) {
-            Coordinate playerCoordinate = me.getWorld().getPlayer().getCoordinate();
-            Coordinate myCoordinate = me.getCoordinate();
-            me.move(Cardinal.getDirection(myCoordinate, playerCoordinate));
+//            Coordinate playerCoordinate = me.getWorld().getPlayer().getCoordinate();
+//            Coordinate myCoordinate = me.getCoordinate();
+//            me.move(Cardinal.getDirection(myCoordinate, playerCoordinate));
         } else {
             super.move(me);
         }
@@ -65,12 +65,13 @@ public class SmartZombieAi extends DumbZombieAi {
      * @return
      */
     private boolean senseHumans(Zombie me) {
-        Player player = me.getWorld().getPlayer();
-
-        boolean xAxis = Math.abs(me.getCoordinate().getX() - player.getCoordinate().getX()) <= 5;
-        boolean yAxis = Math.abs(me.getCoordinate().getY() - player.getCoordinate().getY()) <= 5;
-
-        return xAxis && yAxis;
+//        Creature player = me.getWorld().getPlayer();
+//
+//        boolean xAxis = Math.abs(me.getCoordinate().getX() - player.getCoordinate().getX()) <= 5;
+//        boolean yAxis = Math.abs(me.getCoordinate().getY() - player.getCoordinate().getY()) <= 5;
+//
+//        return xAxis && yAxis;
+        return false;
     }
 
 }

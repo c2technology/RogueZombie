@@ -26,14 +26,22 @@ public abstract class AbstractCreature implements Creature {
     private final World world;
     private final Ai ai;
     private final CreatureType type;
+    private int visionRadius;
 
-    protected AbstractCreature(World world, char glyph, Color color, Ai ai, CreatureType type) {
+    protected AbstractCreature(CreatureType type, int visionRadius, char glyph, Color color, Ai ai, World world) {
         this.id = UUID.randomUUID();
+        this.type = type;
+        this.visionRadius = visionRadius;
         this.glyph = glyph;
         this.color = color;
-        this.world = world;
         this.ai = ai;
-        this.type = type;
+        this.world = world;
+
+    }
+
+    @Override
+    public boolean canSee(Coordinate coordinate) {
+        return ai.canSee(this, coordinate);
     }
 
     @Override
@@ -49,6 +57,11 @@ public abstract class AbstractCreature implements Creature {
     @Override
     public Color getColor() {
         return color;
+    }
+
+    @Override
+    public int getVisionRadius() {
+        return this.visionRadius;
     }
 
     @Override

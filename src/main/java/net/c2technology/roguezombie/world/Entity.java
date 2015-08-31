@@ -14,10 +14,25 @@ import java.awt.Color;
  */
 public interface Entity {
 
+    /**
+     * The color of this {@code Entity}
+     *
+     * @return
+     */
     public Color getColor();
 
+    /**
+     * The representation if this {@code Entity}
+     *
+     * @return
+     */
     public char getGlyph();
 
+    /**
+     * If this {@code Entity} is passable, it can be moved and seen through.
+     *
+     * @return {@code true} if passable
+     */
     public boolean isPassable();
 
 }
