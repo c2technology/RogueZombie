@@ -20,12 +20,14 @@ public class FieldOfView {
 
     private final World world;
     private final Tile[][] rememberedTiles;
-    private final boolean[][] visibleTiles;
+    private boolean[][] visibleTiles;
+    private final int width;
+    private final int height;
 
     public FieldOfView(World world) {
         this.world = world;
-        int width = world.getWidth();
-        int height = world.getHeight();
+        width = world.getWidth();
+        height = world.getHeight();
         this.visibleTiles = new boolean[width][height];
         this.rememberedTiles = new Tile[width][height];
         for (int x = 0; x < width; x++) {
@@ -56,26 +58,39 @@ public class FieldOfView {
      * @param radius
      */
     public void update(Coordinate origin, int radius) {
-        int minX = origin.getX() - radius;
-        int maxX = origin.getX() + radius;
-        int minY = origin.getY() - radius;
-        int maxY = origin.getY() + radius;
+        //Reset what is visible...
+        visibleTiles = new boolean[width][height];
+        int originX = origin.getX();
+        int originY = origin.getY();
+        int minX = originX - radius;
+        int maxX = originX + radius;
+        int minY = originY - radius;
+        int maxY = originY + radius;
 
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
-                if (!insideRadius(x, y, radius)) {
-                    Coordinate target = new Coordinate(x, y);
-                    LineOfSight los = LineOfSight.getLineOfSight(origin, target);
-                    for (Coordinate point : los) {
-                        Tile tile = world.getTile(point);
-                        if (world.getTile(point).isPassable() && world.isInBounds(target)) {
-                            visibleTiles[x][y] = true;
-                            rememberedTiles[x][y] = tile;
-                        } else {
-                            //we hit something we can't see through
-                            break;
-                        }
+                Coordinate target = new Coordinate(x, y);
+                if (!world.isInBounds(target)) {
+                    continue;
+                }
+                if (!LineOfSight.insideRadius(origin, target, radius)) {
+                    visibleTiles[target.getX()][target.getY()] = false;
+                    continue;
+                }
+                LineOfSight los = LineOfSight.getLineOfSight(origin, target);
+                for (Coordinate point : los) {
+//                    if (!world.isInBounds(point)) {
+//                        continue;
+//                    }
+                    Tile tile = world.getTile(point);
+                    int pointX = point.getX();
+                    int pointY = point.getY();
+                    visibleTiles[pointX][pointY] = true;
+                    rememberedTiles[pointX][pointY] = tile;
+                    if (!world.getTile(point).isPassable()) {
+                        break;
                     }
+
                 }
             }
         }
@@ -92,19 +107,4 @@ public class FieldOfView {
         return rememberedTiles[coordinate.getX()][coordinate.getY()];
     }
 
-    /**
-     * Performs the Pythagorean Theorem to determine if the square of the
-     * hypotenuse (c) is greater than
-     *
-     * @param a
-     * @param b
-     * @param c
-     * @return
-     */
-    private boolean insideRadius(int a, int b, int c) {
-        int a2 = a * a;
-        int b2 = b * b;
-        int c2 = c * c;
-        return a2 + b2 <= c2;
-    }
 }
