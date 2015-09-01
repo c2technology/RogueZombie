@@ -1,16 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2015 Chris Ryan
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.c2technology.roguezombie.creature.ai;
 
-import net.c2technology.roguezombie.creature.CreatureFactory;
-import net.c2technology.roguezombie.creature.Player;
-import net.c2technology.roguezombie.creature.Zombie;
+import net.c2technology.roguezombie.creature.Creature;
+import net.c2technology.roguezombie.creature.enemy.Zombie;
 import net.c2technology.roguezombie.world.Cardinal;
 import net.c2technology.roguezombie.world.Coordinate;
-import squidpony.squidmath.RNG;
 
 /**
  * This is the intelligence object for a smart {@code Zombie}. The smart
@@ -18,44 +27,30 @@ import squidpony.squidmath.RNG;
  * will mill around until the {@code Player} is close. When the {@code Player}
  * is close, the smart {@code Zombie} shambles towards the {@code Player}. If
  * the {@code Player} is not close, the smart {@code Zombie} will either take a
- * random and valid step. The smart {@code Zombie} has a 5% chance of generating
- * a new smart {@code Zombie} to simulate a hoarding effect (because there are
- * hidden Zombies everywhere!)
+ * random and valid step or stand still if it fails at taking a step.
  *
  * @author cryan
  */
 public class SmartZombieAi extends DumbZombieAi {
 
-    public SmartZombieAi(CreatureFactory factory) {
-        super(factory);
+    public SmartZombieAi(Zombie zombie) {
+        super(zombie);
     }
 
     /**
      * Determine if the Zombie is near the Player and move towards the player.
      * If the Zombie is not near a player, attempt to move to a random space. If
      * the Zombie cannot move to the random space, the Zombie does not move.
-     *
-     * @param me
      */
     @Override
-    protected void move(Zombie me) {
-        if (senseHumans(me)) {
-//            Coordinate playerCoordinate = me.getWorld().getPlayer().getCoordinate();
-//            Coordinate myCoordinate = me.getCoordinate();
-//            me.move(Cardinal.getDirection(myCoordinate, playerCoordinate));
+    protected void move() {
+        if (senseHumans(self)) {
+            Coordinate playerCoordinate = self.getWorld().getPlayer().getCoordinate();
+            Coordinate myCoordinate = self.getCoordinate();
+            self.move(Cardinal.getDirection(myCoordinate, playerCoordinate));
         } else {
-            super.move(me);
+            super.move();
         }
-    }
-
-    /**
-     * 5% chance to create a new Zombie.
-     *
-     * @return
-     */
-    @Override
-    protected boolean willReplicate() {
-        return new RNG().between(0, 20) == 5;
     }
 
     /**
@@ -65,13 +60,12 @@ public class SmartZombieAi extends DumbZombieAi {
      * @return
      */
     private boolean senseHumans(Zombie me) {
-//        Creature player = me.getWorld().getPlayer();
-//
-//        boolean xAxis = Math.abs(me.getCoordinate().getX() - player.getCoordinate().getX()) <= 5;
-//        boolean yAxis = Math.abs(me.getCoordinate().getY() - player.getCoordinate().getY()) <= 5;
-//
-//        return xAxis && yAxis;
-        return false;
+        Creature player = me.getWorld().getPlayer();
+
+        boolean xAxis = Math.abs(me.getCoordinate().getX() - player.getCoordinate().getX()) <= 5;
+        boolean yAxis = Math.abs(me.getCoordinate().getY() - player.getCoordinate().getY()) <= 5;
+
+        return xAxis && yAxis;
     }
 
 }

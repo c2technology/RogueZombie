@@ -1,14 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2015 Chris Ryan
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.c2technology.roguezombie.world;
 
-import java.util.Arrays;
-import squidpony.squidmath.RNG;
-
 /**
+ * A directional value with the offset for determining relative positioning.
  *
  * @author cryan
  */
@@ -31,21 +40,37 @@ public enum Cardinal {
      * @return
      */
     public static Cardinal random() {
-        return Cardinal.values()[new RNG().between(0, Cardinal.values().length - 1)];
+        return Cardinal.values()[RandomNumber.between(0, Cardinal.values().length - 1)];
     }
 
     private final int xOffset;
     private final int yOffset;
 
+    /**
+     * Enum constructor
+     *
+     * @param xOffset
+     * @param yOffset
+     */
     private Cardinal(int xOffset, int yOffset) {
         this.xOffset = xOffset;
         this.yOffset = yOffset;
     }
 
+    /**
+     * The horizontal offset for moving in this direction
+     *
+     * @return
+     */
     public int getOffsetX() {
         return xOffset;
     }
 
+    /**
+     * The vertical offset for moving in this direction
+     *
+     * @return
+     */
     public int getOffsetY() {
         return yOffset;
     }

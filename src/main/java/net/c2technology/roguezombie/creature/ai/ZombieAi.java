@@ -1,12 +1,23 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2015 Chris Ryan
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.c2technology.roguezombie.creature.ai;
 
-import net.c2technology.roguezombie.creature.CreatureFactory;
-import net.c2technology.roguezombie.creature.Zombie;
+import net.c2technology.roguezombie.creature.Creature;
+import net.c2technology.roguezombie.creature.enemy.Zombie;
 
 /**
  * This is the intelligence object for a {@code Zombie}. A {@code Zombie} mill
@@ -18,60 +29,39 @@ import net.c2technology.roguezombie.creature.Zombie;
  */
 public abstract class ZombieAi extends AbstractCreatureAi<Zombie> {
 
-    protected final CreatureFactory factory;
-
-    protected ZombieAi(CreatureFactory factory) {
-        this.factory = factory;
+    /**
+     * Protected constructor to deter anonymous sub-classing.
+     *
+     * @param zombie
+     */
+    protected ZombieAi(Zombie zombie) {
+        super(zombie);
     }
 
     /**
-     * When the turn ends, a Zombie tries to move in a random direction. It may
-     * or may not attempt to do anything. Zombies also have a 1% chance to
-     * replicate in order to simulate other hiding zombies suddenly appearing.
-     *
-     * @param me The {@code Zombie} using this AI
+     * When the turn ends a {@code Zombie} generally moves.
      */
     @Override
-    public void resolveTurn(Zombie me) {
-        move(me);
-        if (willReplicate()) {
-            replicate(me);
-        }
+    public void resolveTurn() {
+        move();
     }
 
     /**
-     * Moves the {@code Zombie}. If the {@code Zombie} would move into another
-     * creature, the implementation should determine it's action.
-     *
-     * @param me
+     * Delegates movement to implementing classes.
      */
-    protected abstract void move(Zombie me);
+    protected abstract void move();
 
     /**
-     * Attempt to spawn a new Zombie. If successful, and the new Zombie can be
-     * legally placed, the Zombie enters the World. Otherwise, nothing happens.
+     * In general, a {@code Zombie} will only attack another {@code Creature} if
+     * it is not the same type as itself.
      *
-     * @param me
-     */
-    protected abstract void replicate(Creature me);
-
-    /**
-     * Determines if replication will occur;
-     *
-     * @return
-     */
-    protected abstract boolean willReplicate();
-
-    /**
-     * A Zombie will attack anything that is not the same type as itself.
-     *
-     * @param me
      * @param other
      */
     @Override
-    public void attack(Zombie me, Creature other) {
-        if (other.getCreatureType() != me.getCreatureType()) {
-            me.getWorld().remove(other);
+    public void attack(Creature other) {
+        if (other.getCreatureType() != self.getCreatureType()) {
+            //TODO: Implement damage/defense
+            self.getWorld().remove(other);
         }
     }
 }

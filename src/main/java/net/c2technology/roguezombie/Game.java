@@ -1,7 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2015 Chris Ryan
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.c2technology.roguezombie;
 
@@ -13,6 +24,7 @@ import net.c2technology.roguezombie.screen.Screen;
 import net.c2technology.roguezombie.screen.Start;
 
 /**
+ * The {@code Game} handles processing user input and redrawing the interface.
  *
  * @author cryan
  */
@@ -23,6 +35,9 @@ public class Game implements KeyListener {
     private final JFrame window;
     private boolean started = false;
 
+    /**
+     * Create a new {@code Game} object. This will initialize a hidden window.
+     */
     public Game() {
         window = new JFrame();
         content = new AsciiPanel();
@@ -32,6 +47,10 @@ public class Game implements KeyListener {
         window.pack();
     }
 
+    /**
+     * Starts and shows the game. Multiple calls to {@link Game#start()} are
+     * ignored.
+     */
     public void start() {
         if (!started) {
             context = new Start();
@@ -42,29 +61,55 @@ public class Game implements KeyListener {
         }
     }
 
+    /**
+     * Helper function for showing the game window. If the window is already
+     * visible, this call is ignored.
+     */
     private void show() {
         if (!this.window.isVisible()) {
             this.window.setVisible(true);
         }
     }
 
+    /**
+     * Repaints the user interface based on the current content and state of the
+     * game.
+     */
     private void repaint() {
         content.clear();
         context.display(content);
         window.repaint();
     }
 
+    /**
+     * Override for {@link KeyListener#keyTyped(java.awt.event.KeyEvent)}
+     * events. No action is taken when a key is typed.
+     *
+     * @param e
+     */
     @Override
     public void keyTyped(KeyEvent e) {
         //Do nothing
     }
 
+    /**
+     * Handler for key presses. When a key is pressed, the event is passed to
+     * the current game context for processing, then the interface is redrawn.
+     *
+     * @param event
+     */
     @Override
     public void keyPressed(KeyEvent event) {
         context = context.respond(event);
         this.repaint();
     }
 
+    /**
+     * Override for {@link KeyListener#keyReleased(java.awt.event.KeyEvent)}
+     * events. No action is taken.
+     *
+     * @param e
+     */
     @Override
     public void keyReleased(KeyEvent e) {
         //Do nothing

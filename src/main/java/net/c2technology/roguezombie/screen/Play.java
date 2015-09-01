@@ -1,23 +1,40 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2015 Chris Ryan
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.c2technology.roguezombie.screen;
 
 import asciiPanel.AsciiPanel;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import net.c2technology.roguezombie.creature.Creature;
 import net.c2technology.roguezombie.creature.CreatureFactory;
 import net.c2technology.roguezombie.creature.Player;
 import net.c2technology.roguezombie.world.Cardinal;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.Entity;
+import net.c2technology.roguezombie.world.RandomNumber;
 import net.c2technology.roguezombie.world.World;
-import net.c2technology.roguezombie.world.WorldBuilder;
+import net.c2technology.roguezombie.world.dungeon.DungeonBuilder;
 import net.c2technology.roguezombie.world.los.FieldOfView;
 
 /**
+ * The {@code Play} {@code Screen} shows the actual progress and state of the
+ * game. This also processes delegated input from the human user.
+ *
+ * Game time!
  *
  * @author cryan
  */
@@ -29,44 +46,62 @@ public class Play implements Screen {
     private final FieldOfView fieldOfView;
     private final CreatureFactory creatureFactory;
     private final Player player;
+    private boolean fogOfWar = true;
 
+    /**
+     * Default constructor
+     */
     public Play() {
+        //TODO: Take screen size as parameters? Could make the underlying World it proportional to the visible screen size...
         this.screenWidth = 80;
         this.screenHeight = 21;
-
         creatureFactory = new CreatureFactory();
-
         world = createWorld();
         fieldOfView = new FieldOfView(world);
         player = creatureFactory.makePlayer(world, fieldOfView);
+
         player.setCoordinate(world.getRandomSpawnableLocation());
+        world.setPlayer(player);
 
     }
 
+    /**
+     * Creates the actual world. This world is of the Dungeon variety and will
+     * have rooms and hallways.
+     *
+     * @return
+     */
     private World createWorld() {
-        return new WorldBuilder(90, 31).designWorld().build();
+        World newWorld = new DungeonBuilder(90, 31).build();
+        return decorateWorld(newWorld);
+
     }
 
-    public Coordinate getScrollCoordinate() {
+    /**
+     * Gets the coordinate at the top-left corner of the visible screen. Useful
+     * when determining the scrolling offset.
+     *
+     * @return
+     */
+    private Coordinate getTopLeft() {
         int x = Math.max(0, Math.min(player.getCoordinate().getX() - screenWidth / 2, world.getWidth() - screenWidth));
         int y = Math.max(0, Math.min(player.getCoordinate().getY() - screenHeight / 2, world.getHeight() - screenHeight));
         return new Coordinate(x, y);
     }
 
     /**
-     * Render all visible aspects of the world starting at the {@code topLeft}
-     * of the visible world.
+     * Render all visible aspects of the world relative to the {@code Player}.
      *
      * @param context
-     * @param topLeft
      */
-    private void displayWorld(AsciiPanel context, Coordinate topLeft) {//10, 15
+    private void displayWorld(AsciiPanel context) {
+        Coordinate topLeft = getTopLeft();
         for (int x = 0; x < screenWidth; x++) {
             for (int y = 0; y < screenHeight; y++) {
                 Coordinate coordinate = new Coordinate(x + topLeft.getX(), y + topLeft.getY());
                 Entity entity;
                 Color color;
-                if (player.canSee(coordinate)) {
+                if (player.canSee(coordinate) || !fogOfWar) {
                     //Get the creature or tile, whatever is there..
                     entity = world.getEntity(coordinate);
                     color = entity.getColor();
@@ -80,14 +115,18 @@ public class Play implements Screen {
         }
     }
 
+    /**
+     * Displays this {@code Screen} on the given {@code terminal}.
+     *
+     * @param terminal
+     */
     @Override
     public void display(AsciiPanel terminal) {
         terminal.write("You are having fun.", 1, 1);
-        Coordinate upperLeftPosition = getScrollCoordinate();
         Coordinate playerCoordinate = player.getCoordinate();
         fieldOfView.update(playerCoordinate, player.getVisionRadius());
-        displayWorld(terminal, upperLeftPosition);
-
+        displayWorld(terminal);
+        Coordinate upperLeftPosition = getTopLeft();
         terminal.write(player.getGlyph(), playerCoordinate.getX() - upperLeftPosition.getX(), playerCoordinate.getY() - upperLeftPosition.getY(), player.getColor());
         terminal.writeCenter("X: " + playerCoordinate.getX(), 21);
         terminal.writeCenter("Y: " + playerCoordinate.getY(), 22);
@@ -95,6 +134,13 @@ public class Play implements Screen {
 //        terminal.writeCenter("-- press [escape] to lose or [enter] to win --", 23);
     }
 
+    /**
+     * Handles the delegated {@code KeyEvent} and returns the updated
+     * {@code Screen}.
+     *
+     * @param key
+     * @return
+     */
     @Override
     public Screen respond(KeyEvent key) {
         Cardinal cardinal;
@@ -139,14 +185,43 @@ public class Play implements Screen {
             case KeyEvent.VK_Y:
                 cardinal = Cardinal.NORTH_WEST;
                 break;
+            //toggle Fog of War
+            case KeyEvent.VK_Z:
+                fogOfWar = !fogOfWar;
+                return this;
             default:
-                cardinal = Cardinal.NONE;
-                break;
+                return this;
         }
         world.move(player, cardinal);
         world.endTurn();
 
         return this;
+    }
+
+    /**
+     * Decorates the {@code World} with various items.
+     *
+     * @param world
+     * @return
+     */
+    private World decorateWorld(World world) {
+        return createCreatures(world);
+    }
+
+    /**
+     * Creates random creatures and places them into this {@code World}
+     *
+     * @param factory
+     */
+    private World createCreatures(World world) {
+        //TODO: Allow this to be configurable for difficulty
+        int creatureLimit = RandomNumber.between(5, 10);
+        for (int i = 0; i <= creatureLimit; i++) {
+            Creature creature = creatureFactory.makeZombie(world);
+            creature.setCoordinate(world.getRandomSpawnableLocation());
+            world.addCreature(creature);
+        }
+        return world;
     }
 
 }

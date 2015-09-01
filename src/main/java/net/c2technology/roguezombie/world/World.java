@@ -1,7 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2015 Chris Ryan
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.c2technology.roguezombie.world;
 
@@ -10,9 +21,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import net.c2technology.roguezombie.creature.ai.Creature;
+import net.c2technology.roguezombie.creature.Creature;
 import net.c2technology.roguezombie.creature.CreatureFactory;
-import squidpony.squidmath.RNG;
+import net.c2technology.roguezombie.creature.Player;
 
 /**
  * A {@code World} handles all state manipulation of it's denizens and utilizes
@@ -27,6 +38,7 @@ public class World {
     private final int height;
     private final UUID[][] creatureLocator;
     private final Map<UUID, Creature> creatureRegistry;
+    private Player player;
 
     /**
      * Creates a new {@code World} with the given {@code tiles} as the terrain.
@@ -44,7 +56,6 @@ public class World {
         }
         this.creatureLocator = new UUID[width][height];
         this.creatureRegistry = new HashMap();
-
     }
 
     /**
@@ -55,21 +66,8 @@ public class World {
      * @return
      */
     public Creature getCreature(Coordinate coordinate) {
-        int x = coordinate.getX();
-        int y = coordinate.getY();
-        return getCreature(x, y);
-    }
-
-    /**
-     * Helper method for direct access to a Creature internally.
-     *
-     * @param x
-     * @param y
-     * @return
-     */
-    private Creature getCreature(int x, int y) {
-        if (!outOfBounds(x, y)) {
-            UUID creatureId = creatureLocator[x][y];
+        if (isInBounds(coordinate)) {
+            UUID creatureId = creatureLocator[coordinate.getX()][coordinate.getY()];
             //Is there a creature at this location?
             if (creatureId != null && creatureRegistry.containsKey(creatureId)) {
                 return creatureRegistry.get(creatureId);
@@ -104,24 +102,11 @@ public class World {
      * @param coordinate
      * @return
      */
-    public Tile getTile(Coordinate coordinate) {
-        int x = coordinate.getX();
-        int y = coordinate.getY();
-        return getTile(x, y);
-    }
-
-    /**
-     * Internal direct access to a Tile.
-     *
-     * @param x
-     * @param y
-     * @return
-     */
-    private Tile getTile(int x, int y) {
-        if (outOfBounds(x, y)) {
+    public final Tile getTile(Coordinate coordinate) {
+        if (!isInBounds(coordinate)) {
             return Tile.BOUNDS;
         }
-        return tiles[x][y];
+        return tiles[coordinate.getX()][coordinate.getY()];
     }
 
     /**
@@ -160,8 +145,9 @@ public class World {
      * @param creature
      */
     public void remove(Creature creature) {
-        if (!outOfBounds(creature)) {
-            Creature dead = getCreature(creature.getCoordinate());
+        Coordinate creatureLocation = creature.getCoordinate();
+        if (isInBounds(creatureLocation)) {
+            Creature dead = getCreature(creatureLocation);
             if (dead != null) {
                 creatureRegistry.remove(dead.getId());
                 creatureLocator[dead.getCoordinate().getX()][dead.getCoordinate().getY()] = null;
@@ -176,7 +162,7 @@ public class World {
     public void endTurn() {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                Creature creature = getCreature(x, y);
+                Creature creature = getCreature(new Coordinate(x, y));
                 if (creature != null) {
                     creature.resolveTurn();
                 }
@@ -201,16 +187,16 @@ public class World {
      * @return
      */
     public final Coordinate getRandomSpawnableLocation() {
-        int x;
-        int y;
 
+        Coordinate coordinate;
         //TODO: This logic should be determined by something else. Otherwise, we will need to add additional checks for unknown types (water is impassible without a boat [or bridge, but only for 1 block] .. etc).
         do {
-            x = (int) (Math.random() * width);//90
-            y = (int) (Math.random() * height);//31
-        } while (!getTile(x, y).isPassable() && getCreature(x, y) == null);
+            int x = (int) (Math.random() * width);//90
+            int y = (int) (Math.random() * height);//31
+            coordinate = new Coordinate(x, y);
+        } while (!getTile(coordinate).isPassable() && getCreature(coordinate) == null);
 
-        return new Coordinate(x, y);
+        return coordinate;
 
     }
 
@@ -243,7 +229,8 @@ public class World {
     }
 
     /**
-     * Moves a {@code creature} within the world in the given {@code direction}.
+     * Moves a {@code Creature} or {@code Player} within the world in the given
+     * {@code direction}.
      *
      * @param creature
      * @param direction
@@ -269,61 +256,37 @@ public class World {
      * it is updated.
      *
      * @param creature
+     * @return
      */
     public boolean addCreature(Creature creature) {
         //TODO: Make a spawn method that spawns within a given range of a given coordinate
         boolean added = false;
-        if (!outOfBounds(creature)) {
+        Coordinate creatureLocation = creature.getCoordinate();
+        if (isInBounds(creatureLocation)) {
             creatureRegistry.put(creature.getId(), creature);
-            creatureLocator[creature.getCoordinate().getX()][creature.getCoordinate().getY()] = creature.getId();
+            creatureLocator[creatureLocation.getX()][creatureLocation.getY()] = creature.getId();
             added = true;
         }
         return added;
     }
 
-    private void createCreatures(CreatureFactory factory) {
-        //TODO: Allow this to be configurable for difficulty
-        int creatureLimit = new RNG().between(5, 10);
-        for (int i = 0; i <= creatureLimit; i++) {
-            Creature creature = factory.makeZombie(this);
-            creature.setCoordinate(getRandomSpawnableLocation());
-            addCreature(creature);
-        }
+    /**
+     * Adds the {@code Player} if it does not exist. If it does exist, it is
+     * updated.
+     *
+     * @param player
+     */
+    public void addPlayer(Player player) {
+        this.player = player;
     }
 
+    /**
+     * All {@code Creatures} in this {@code World}, excluding the {@code Player}
+     *
+     * @return
+     */
     public Collection<Creature> getCreatures() {
         return this.creatureRegistry.values();
-    }
-
-    /**
-     * Helper function for boundary testing of {@code Coordinate}
-     *
-     * @param coordinate
-     * @return
-     */
-    private boolean outOfBounds(Coordinate coordinate) {
-        return outOfBounds(coordinate.getX(), coordinate.getY());
-    }
-
-    /**
-     * Tests to determine if the given coordinates are out of bounds.
-     *
-     * @param creature
-     * @return
-     */
-    private boolean outOfBounds(int x, int y) {
-        //Check for out of bounds for fast failures
-        return x < 0 || x >= width || y < 0 || y >= height;
-    }
-
-    /**
-     * Helper method for creatures
-     *
-     * @param creature
-     * @return
-     */
-    private boolean outOfBounds(Creature creature) {
-        return outOfBounds(creature.getCoordinate());
     }
 
     /**
@@ -342,14 +305,39 @@ public class World {
             creatureRegistry.put(creature.getId(), creature);
             creatureLocator[creature.getCoordinate().getX()][creature.getCoordinate().getY()] = creature.getId();
         } catch (UnspawnableException e) {
+            //TODO: Implement logging?
             System.out.println("Could not spawn creature at " + creature.getCoordinate().toString());
         }
     }
 
+    /**
+     * Determines if the given {@code target} is located within the
+     * {@code World}
+     *
+     * @param target
+     * @return
+     */
     public boolean isInBounds(Coordinate target) {
         int x = target.getX();
         int y = target.getY();
         return (x >= 0 && x < width) && (y >= 0 && y < height);
+    }
+
+    /**
+     * Sets the {@code Player} in this {@code World}
+     *
+     * @param player
+     */
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    /**
+     * Retrieves the current {@code Player} in this {@code World]
+     * @return
+     */
+    public Player getPlayer() {
+        return this.player;
     }
 
 }
