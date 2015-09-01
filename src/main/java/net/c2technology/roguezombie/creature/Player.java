@@ -17,7 +17,6 @@
 package net.c2technology.roguezombie.creature;
 
 import java.awt.Color;
-import net.c2technology.roguezombie.creature.ai.PlayerAi;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.World;
 
@@ -31,6 +30,7 @@ import net.c2technology.roguezombie.world.World;
  */
 public class Player extends AbstractCreature {
 
+    //TODO: Add Inventory
     //TODO: Implement changeable AI for added effects (poison, confused, etc)..
     /**
      * Constructs a {@code Player} object. The {@code PlayerAi} provides the

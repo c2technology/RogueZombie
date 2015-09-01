@@ -23,26 +23,29 @@ import asciiPanel.AsciiPanel;
 import net.c2technology.roguezombie.creature.ai.DumbZombieAi;
 import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
 import net.c2technology.roguezombie.creature.ai.ZombieAi;
+import net.c2technology.roguezombie.item.Helicopter;
+import net.c2technology.roguezombie.item.Item;
 //import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
 //import net.c2technology.roguezombie.creature.ai.ZombieAi;
 import net.c2technology.roguezombie.world.World;
 import net.c2technology.roguezombie.world.los.FieldOfView;
 
 /**
- * Creates the majority of {@code Creature} objects that could be placed in the
- * {@code World}. All but the {@code Player} is randomized to some degree.
- *
- * Churns out {@code Creature}s like there's no tomorrow (for the {@code Player}
- * that is).
+ * Creates the majority of objects that could be placed in a {@code World}. All
+ * but the {@code Player} is randomized.
  *
  * @author cryan
  */
-public class CreatureFactory {
+public class ClutterFactory {
 
+    //TODO: Create a Creature table with known creatures that can be slightly randomized on creation
+    //TODO: Create a CreatureAi table with a lookup based on CreatureType
+    //TODO: Create an Item table with known Items that can be slightly randomized
+    //TODO: When making something (creature, item, etc). Pick a random "thing" and randomize what you can.
     /**
      * Default constructor.
      */
-    public CreatureFactory() {
+    public ClutterFactory() {
 
     }
 
@@ -57,24 +60,35 @@ public class CreatureFactory {
     public Player makePlayer(World world, FieldOfView fieldOfView) {
 
         Player player = new Player(world, '@', AsciiPanel.brightWhite, 2);
-        //TODO: This seems a bit wonky.
+        //TODO: This seems a bit wonky to give the subject to the AI.
         PlayerAi playerAi = new PlayerAi(player, fieldOfView);
         return player;
     }
 
     /**
-     * Creates a {@code Zombie}. The new {@code Zombie} has a randomly selected
-     * {@code Ai}.
+     * Creates a {@code Creature}. The new {@code Creature} has a randomly
+     * selected {@code Ai}.
      *
-     * @param world The {@code World} in which the new {@code Zombie} belongs.
+     * @param world The {@code World} in which the new {@code Creature} belongs.
      * @return
      */
-    public Zombie makeZombie(World world) {
+    public Creature makeCreature(World world) {
 
         Zombie zombie = new Zombie(world, 'Z', AsciiPanel.green);
-        //TODO: This seems a bit wonky.
+        //TODO: This seems a bit wonky to give the subject to the AI.
         ZombieAi zombieAi = Math.random() > .5 ? new DumbZombieAi(zombie) : new SmartZombieAi(zombie);
         return zombie;
+    }
+
+    /**
+     * Creates an {@code Item}. The new {@code Item} has a randomly selected
+     * {@code Ai}.
+     *
+     * @param world The {@code World} in which the new {@code Item} belongs.
+     * @return
+     */
+    public Item makeItem(World world) {
+        return new Helicopter();
     }
 
 }

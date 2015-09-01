@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.c2technology.roguezombie.creature.Creature;
-import net.c2technology.roguezombie.creature.CreatureFactory;
 import net.c2technology.roguezombie.creature.Player;
+import net.c2technology.roguezombie.item.Item;
 
 /**
  * A {@code World} handles all state manipulation of it's denizens and utilizes
@@ -34,10 +34,12 @@ import net.c2technology.roguezombie.creature.Player;
 public class World {
 
     private final Tile[][] tiles;
+    private final UUID[][] itemLocator;
     private final int width;
     private final int height;
     private final UUID[][] creatureLocator;
     private final Map<UUID, Creature> creatureRegistry;
+    private final Map<UUID, Item> itemRegistry;
     private Player player;
 
     /**
@@ -54,8 +56,10 @@ public class World {
         } else {
             this.height = 0;
         }
+        this.itemLocator = new UUID[width][height];
         this.creatureLocator = new UUID[width][height];
         this.creatureRegistry = new HashMap();
+        this.itemRegistry = new HashMap();
     }
 
     /**
@@ -71,6 +75,25 @@ public class World {
             //Is there a creature at this location?
             if (creatureId != null && creatureRegistry.containsKey(creatureId)) {
                 return creatureRegistry.get(creatureId);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns an {@code Item} if one exists at the given {@code coordinate}. If
+     * no {@code Item} exists, {@code null} is returned.
+     *
+     * @param coordinate
+     * @return
+     */
+    public Item getItem(Coordinate coordinate) {
+        //TODO: A more generic registry object can be made to handle the various types of entity types (item, creature, etc).
+        if (isInBounds(coordinate)) {
+            UUID itemId = itemLocator[coordinate.getX()][coordinate.getY()];
+            //Is there a creature at this location?
+            if (itemId != null && itemRegistry.containsKey(itemId)) {
+                return itemRegistry.get(itemId);
             }
         }
         return null;
@@ -131,8 +154,12 @@ public class World {
      * @return
      */
     public Entity getEntity(Coordinate coordinate) {
-        //TODO: Will have to add additional logic in here if we go past Creature and Tile...
+        //TODO: Will have to add additional logic in here if we go past Creature, Item, and Tile...
         Entity entity = getCreature(coordinate);
+        if (entity != null) {
+            return entity;
+        }
+        entity = getItem(coordinate);
         if (entity != null) {
             return entity;
         }
@@ -252,17 +279,19 @@ public class World {
     }
 
     /**
-     * Adds the given {@code Creature} if it does not exist. If it does exist,
-     * it is updated.
+     * Spawns the given {@code Creature} in a random location. If it does exist,
+     * an additional {@code Creature} is not created but its location is
+     * updated.
      *
      * @param creature
      * @return
      */
-    public boolean addCreature(Creature creature) {
+    public boolean spawnCreature(Creature creature) {
         //TODO: Make a spawn method that spawns within a given range of a given coordinate
         boolean added = false;
-        Coordinate creatureLocation = creature.getCoordinate();
+        Coordinate creatureLocation = getRandomSpawnableLocation();
         if (isInBounds(creatureLocation)) {
+            creature.setCoordinate(creatureLocation);
             creatureRegistry.put(creature.getId(), creature);
             creatureLocator[creatureLocation.getX()][creatureLocation.getY()] = creature.getId();
             added = true;
@@ -287,27 +316,6 @@ public class World {
      */
     public Collection<Creature> getCreatures() {
         return this.creatureRegistry.values();
-    }
-
-    /**
-     * Spawns a creature. If the creature's coordinates are not spawnable,
-     * attempts will be made within a small range around the original
-     * coordinates. If the creature cannot be spawned within the range it will
-     * not spawn.
-     *
-     * @param creature
-     */
-    public void spawn(Creature creature) {
-        try {
-            Coordinate coord = getSpawnableLocation(creature.getCoordinate());
-            creature.setCoordinate(coord);
-            //TODO: Determine better method for this
-            creatureRegistry.put(creature.getId(), creature);
-            creatureLocator[creature.getCoordinate().getX()][creature.getCoordinate().getY()] = creature.getId();
-        } catch (UnspawnableException e) {
-            //TODO: Implement logging?
-            System.out.println("Could not spawn creature at " + creature.getCoordinate().toString());
-        }
     }
 
     /**
@@ -338,6 +346,24 @@ public class World {
      */
     public Player getPlayer() {
         return this.player;
+    }
+
+    /**
+     * Adds an item to this {@code World}. Returns {@code true} if successful.
+     *
+     * @param item
+     * @return
+     */
+    public boolean addItem(Item item) {
+        //TODO: Make a spawn method that spawns within a given range of a given coordinate
+        boolean added = false;
+        Coordinate location = getRandomSpawnableLocation();
+        if (isInBounds(location)) {
+            itemRegistry.put(item.getId(), item);
+            itemLocator[location.getX()][location.getY()] = item.getId();
+            added = true;
+        }
+        return added;
     }
 
 }

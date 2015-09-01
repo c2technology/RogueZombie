@@ -20,8 +20,9 @@ import asciiPanel.AsciiPanel;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import net.c2technology.roguezombie.creature.Creature;
-import net.c2technology.roguezombie.creature.CreatureFactory;
+import net.c2technology.roguezombie.creature.ClutterFactory;
 import net.c2technology.roguezombie.creature.Player;
+import net.c2technology.roguezombie.item.Item;
 import net.c2technology.roguezombie.world.Cardinal;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.Entity;
@@ -44,7 +45,7 @@ public class Play implements Screen {
     private final int screenWidth;
     private final int screenHeight;
     private final FieldOfView fieldOfView;
-    private final CreatureFactory creatureFactory;
+    private final ClutterFactory clutterFactory;
     private final Player player;
     private boolean fogOfWar = true;
 
@@ -55,10 +56,10 @@ public class Play implements Screen {
         //TODO: Take screen size as parameters? Could make the underlying World it proportional to the visible screen size...
         this.screenWidth = 80;
         this.screenHeight = 21;
-        creatureFactory = new CreatureFactory();
+        clutterFactory = new ClutterFactory();
         world = createWorld();
         fieldOfView = new FieldOfView(world);
-        player = creatureFactory.makePlayer(world, fieldOfView);
+        player = clutterFactory.makePlayer(world, fieldOfView);
 
         player.setCoordinate(world.getRandomSpawnableLocation());
         world.setPlayer(player);
@@ -73,7 +74,8 @@ public class Play implements Screen {
      */
     private World createWorld() {
         World newWorld = new DungeonBuilder(90, 31).build();
-        return decorateWorld(newWorld);
+        decorateWorld(newWorld);
+        return newWorld;
 
     }
 
@@ -204,24 +206,38 @@ public class Play implements Screen {
      * @param world
      * @return
      */
-    private World decorateWorld(World world) {
-        return createCreatures(world);
+    private void decorateWorld(World world) {
+        createCreatures(world);
+        createItems(world);
     }
 
     /**
-     * Creates random creatures and places them into this {@code World}
+     * Creates random creatures and places them into the {@code world}
      *
      * @param factory
      */
-    private World createCreatures(World world) {
+    private void createCreatures(World world) {
         //TODO: Allow this to be configurable for difficulty
         int creatureLimit = RandomNumber.between(5, 10);
         for (int i = 0; i <= creatureLimit; i++) {
-            Creature creature = creatureFactory.makeZombie(world);
-            creature.setCoordinate(world.getRandomSpawnableLocation());
-            world.addCreature(creature);
+            Creature creature = clutterFactory.makeCreature(world);
+            world.spawnCreature(creature);
         }
-        return world;
     }
 
+    /**
+     * Creates random {@code Item}s and places them into the {@code world}
+     *
+     * @param factory
+     */
+    private void createItems(World world) {
+        //TODO: Add more items
+//        int itemLimit = RandomNumber.between(15, 20);
+//        for (int i = 0; i <= itemLimit; i++) {
+//        Item item = clutterFactory.makeItem(world);
+//            world.addItem(item);
+//        }
+        //Currently only making a helicopter (the exit)
+        world.addItem(clutterFactory.makeItem(world));
+    }
 }

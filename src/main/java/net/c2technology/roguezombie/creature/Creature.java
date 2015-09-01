@@ -16,11 +16,10 @@
  */
 package net.c2technology.roguezombie.creature;
 
-import java.util.UUID;
 import net.c2technology.roguezombie.creature.ai.Ai;
 import net.c2technology.roguezombie.world.Cardinal;
 import net.c2technology.roguezombie.world.Coordinate;
-import net.c2technology.roguezombie.world.Entity;
+import net.c2technology.roguezombie.world.Identifiable;
 import net.c2technology.roguezombie.world.World;
 
 /**
@@ -29,14 +28,7 @@ import net.c2technology.roguezombie.world.World;
  *
  * @author cryan
  */
-public interface Creature extends Entity {
-
-    /**
-     * The unique ID of this {@code Creature}.
-     *
-     * @return
-     */
-    public UUID getId();
+public interface Creature extends Identifiable {
 
     /**
      * Moves the {@code Creature} in the given cardinal direction.
@@ -118,12 +110,11 @@ public interface Creature extends Entity {
      * @return
      */
     public boolean canSee(Coordinate coordinate);
-    
+
 //    public void modifyHp(int amount) {
 //        hp += amount;
 //    
 //        if (hp < 1)
 //         world.remove(this);
 //    }
-
 }
