@@ -63,7 +63,7 @@ public class Win implements Screen {
         terminal.write(longStripe, 30, 12, Color.WHITE, Color.WHITE);
         terminal.write(longStripe, 30, 13, Color.RED, Color.RED);
 
-        terminal.write("Hey dudes, Thanks", 1, 2);
+        terminal.write("Hey dude, Thanks", 1, 2);
         terminal.write("for rescuing me.", 5, 4);
         terminal.write("Let's go for", 9, 6);
         terminal.write("a burger...", 9, 8);
