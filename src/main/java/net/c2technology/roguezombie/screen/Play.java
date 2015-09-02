@@ -61,7 +61,7 @@ public class Play implements Screen {
         fieldOfView = new FieldOfView(world);
         player = clutterFactory.makePlayer(world, fieldOfView);
 
-        player.setCoordinate(world.getRandomSpawnableLocation());
+        player.forceMove(world.getRandomSpawnableLocation());
         world.setPlayer(player);
 
     }
@@ -103,7 +103,7 @@ public class Play implements Screen {
                 Coordinate coordinate = new Coordinate(x + topLeft.getX(), y + topLeft.getY());
                 Entity entity;
                 Color color;
-                if (player.canSee(coordinate) || !fogOfWar) {
+                if (player.look(coordinate) || !fogOfWar) {
                     //Get the creature or tile, whatever is there..
                     entity = world.getEntity(coordinate);
                     color = entity.getColor();

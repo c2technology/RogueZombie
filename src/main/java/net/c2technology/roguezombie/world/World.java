@@ -81,8 +81,11 @@ public class World {
     }
 
     /**
-     * Returns an {@code Item} if one exists at the given {@code coordinate}. If
-     * no {@code Item} exists, {@code null} is returned.
+     * Removes an {@code Item} from the {@code World} if one exists at the given
+     * {@code coordinate}. If no {@code Item} exists, {@code null} is returned.
+     *
+     * Once this function is called, the {@code Item} is no longer available
+     * until it is added back to the {@code World}.
      *
      * @param coordinate
      * @return
@@ -93,7 +96,7 @@ public class World {
             UUID itemId = itemLocator[coordinate.getX()][coordinate.getY()];
             //Is there a creature at this location?
             if (itemId != null && itemRegistry.containsKey(itemId)) {
-                return itemRegistry.get(itemId);
+                return itemRegistry.remove(itemId);
             }
         }
         return null;
@@ -291,7 +294,7 @@ public class World {
         boolean added = false;
         Coordinate creatureLocation = getRandomSpawnableLocation();
         if (isInBounds(creatureLocation)) {
-            creature.setCoordinate(creatureLocation);
+            creature.forceMove(creatureLocation);
             creatureRegistry.put(creature.getId(), creature);
             creatureLocator[creatureLocation.getX()][creatureLocation.getY()] = creature.getId();
             added = true;

@@ -66,6 +66,11 @@ public class DungeonBuilder extends AbstractWorldBuilder {
 
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
+                    //Wall this place in!
+                    if (x == 0 || y == 0 || x == width || y == height) {
+                        setTile(Tile.WALL, new Coordinate(x, y));
+                        continue;
+                    }
                     Terrain tile = terrain[x][y];
                     switch (tile.symbol()) {
                         case '#':

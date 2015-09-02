@@ -25,6 +25,7 @@ import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
 import net.c2technology.roguezombie.creature.ai.ZombieAi;
 import net.c2technology.roguezombie.item.Helicopter;
 import net.c2technology.roguezombie.item.Item;
+import net.c2technology.roguezombie.world.RandomNumber;
 //import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
 //import net.c2technology.roguezombie.creature.ai.ZombieAi;
 import net.c2technology.roguezombie.world.World;
@@ -59,7 +60,7 @@ public class ClutterFactory {
      */
     public Player makePlayer(World world, FieldOfView fieldOfView) {
 
-        Player player = new Player(world, '@', AsciiPanel.brightWhite, 2);
+        Player player = new Player(world, '@', AsciiPanel.brightWhite, makeInventory(), 2);
         //TODO: This seems a bit wonky to give the subject to the AI.
         PlayerAi playerAi = new PlayerAi(player, fieldOfView);
         return player;
@@ -74,7 +75,8 @@ public class ClutterFactory {
      */
     public Creature makeCreature(World world) {
 
-        Zombie zombie = new Zombie(world, 'Z', AsciiPanel.green);
+        //TODO: Add a real inventory to Zombies.
+        Zombie zombie = new Zombie(world, 'Z', AsciiPanel.green, new BasicInventory(0));
         //TODO: This seems a bit wonky to give the subject to the AI.
         ZombieAi zombieAi = Math.random() > .5 ? new DumbZombieAi(zombie) : new SmartZombieAi(zombie);
         return zombie;
@@ -89,6 +91,10 @@ public class ClutterFactory {
      */
     public Item makeItem(World world) {
         return new Helicopter();
+    }
+
+    private Inventory makeInventory() {
+        return new BasicInventory(RandomNumber.between(5, 10));
     }
 
 }

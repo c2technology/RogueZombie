@@ -19,6 +19,7 @@ package net.c2technology.roguezombie.creature;
 import net.c2technology.roguezombie.creature.ai.Ai;
 import java.awt.Color;
 import java.util.UUID;
+import net.c2technology.roguezombie.item.Item;
 import net.c2technology.roguezombie.world.Cardinal;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.World;
@@ -38,6 +39,7 @@ public abstract class AbstractCreature implements Creature {
     private final UUID id;
     private final Color color;
     private final char glyph;
+    private final Inventory inventory;
     private Coordinate coordinate;
     private final World world;
     private Ai ai;
@@ -52,14 +54,16 @@ public abstract class AbstractCreature implements Creature {
      * @param visionRadius
      * @param glyph
      * @param color
+     * @param inventory
      * @param world
      */
-    protected AbstractCreature(CreatureType type, int visionRadius, char glyph, Color color, World world) {
+    protected AbstractCreature(CreatureType type, int visionRadius, char glyph, Color color, Inventory inventory, World world) {
         this.id = UUID.randomUUID();
         this.type = type;
         this.visionRadius = visionRadius;
         this.glyph = glyph;
         this.color = color;
+        this.inventory = inventory;
         this.world = world;
     }
 
@@ -72,8 +76,19 @@ public abstract class AbstractCreature implements Creature {
      * @return
      */
     @Override
-    public boolean canSee(Coordinate coordinate) {
+    public boolean look(Coordinate coordinate) {
         return ai.canSee(coordinate);
+    }
+
+    @Override
+    public void pickup() {
+        inventory.add(this.world.getItem(getCoordinate()));
+    }
+
+    @Override
+    public void drop(Item item) {
+        world.addItem(item);
+        inventory.remove(item);
     }
 
     @Override
@@ -169,7 +184,7 @@ public abstract class AbstractCreature implements Creature {
      * @param coordinate
      */
     @Override
-    public void setCoordinate(Coordinate coordinate) {
+    public void forceMove(Coordinate coordinate) {
         this.coordinate = coordinate;
     }
 
@@ -195,7 +210,7 @@ public abstract class AbstractCreature implements Creature {
         Coordinate oldCoordinate = getCoordinate();
         Coordinate newCoordinate = new Coordinate(coordinate.getX() + cardinal.getOffsetX(), coordinate.getY() + cardinal.getOffsetY());
         if (getAi().canEnter(newCoordinate, getWorld().getTile(newCoordinate))) {
-            setCoordinate(newCoordinate);
+            forceMove(newCoordinate);
             getWorld().creatureMoved(this, oldCoordinate);
         } else {
             //We can't enter... is this an enemy encounter?

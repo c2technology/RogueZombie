@@ -17,6 +17,7 @@
 package net.c2technology.roguezombie.creature;
 
 import net.c2technology.roguezombie.creature.ai.Ai;
+import net.c2technology.roguezombie.item.Item;
 import net.c2technology.roguezombie.world.Cardinal;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.Identifiable;
@@ -49,7 +50,7 @@ public interface Creature extends Identifiable {
      *
      * @param coordinate
      */
-    public void onEnter(Coordinate coordinate);
+    public void enter(Coordinate coordinate);
 
     /**
      * The current location of this {@code Creature}
@@ -70,7 +71,7 @@ public interface Creature extends Identifiable {
      *
      * @param coordinate
      */
-    public void setCoordinate(Coordinate coordinate);
+    public void forceMove(Coordinate coordinate);
 
     /**
      * The {@code World} this {@code Creature} belongs in.
@@ -109,7 +110,19 @@ public interface Creature extends Identifiable {
      * @param coordinate
      * @return
      */
-    public boolean canSee(Coordinate coordinate);
+    public boolean look(Coordinate coordinate);
+
+    /**
+     * Picks up an {@code Item} at the current {@code Coordinate}.
+     */
+    public void pickup();
+
+    /**
+     * Drops the {@code item} at the current {@code Coordinate}.
+     *
+     * @param item The {@code Item} to drop.
+     */
+    public void drop(Item item);
 
 //    public void modifyHp(int amount) {
 //        hp += amount;

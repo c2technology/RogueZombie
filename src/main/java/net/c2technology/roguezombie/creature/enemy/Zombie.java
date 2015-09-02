@@ -20,6 +20,7 @@ import java.awt.Color;
 import net.c2technology.roguezombie.creature.AbstractCreature;
 import net.c2technology.roguezombie.creature.CreatureType;
 import net.c2technology.roguezombie.creature.Creature;
+import net.c2technology.roguezombie.creature.Inventory;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.World;
 
@@ -38,9 +39,10 @@ public class Zombie extends AbstractCreature {
      * @param world The {@code World} in which this {@code Zombie} resides.
      * @param glyph The representation of this {@code Zombie}
      * @param color The color of this {@code Zombie}
+     * @param inventory The {@code Inventory} of this {@code Zombie}
      */
-    public Zombie(World world, char glyph, Color color) {
-        super(CreatureType.MOB, glyph, glyph, color, world);
+    public Zombie(World world, char glyph, Color color, Inventory inventory) {
+        super(CreatureType.MOB, glyph, glyph, color, inventory, world);
     }
 
     /**
@@ -50,10 +52,10 @@ public class Zombie extends AbstractCreature {
      * @param coordinate
      */
     @Override
-    public void onEnter(Coordinate coordinate) {
+    public void enter(Coordinate coordinate) {
         if (getAi().canEnter(coordinate, getWorld().getTile(coordinate))) {
             Coordinate oldCoordinate = this.getCoordinate();
-            this.setCoordinate(coordinate);
+            this.forceMove(coordinate);
             getWorld().creatureMoved(this, oldCoordinate);
         }
 

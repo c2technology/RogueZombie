@@ -40,10 +40,11 @@ public class Player extends AbstractCreature {
      * @param world The {@code World} in which this {@code Player} lives
      * @param glyph The representation of this {@code Player}
      * @param color The color if this {@code Player}
+     * @param inventory The starting {@code Inventory} of this {@code Player}
      * @param visionRadius The range of vision of this {@code Player}
      */
-    public Player(World world, char glyph, Color color, int visionRadius) {
-        super(CreatureType.PLAYER, visionRadius, glyph, color, world);
+    public Player(World world, char glyph, Color color, Inventory inventory, int visionRadius) {
+        super(CreatureType.PLAYER, visionRadius, glyph, color, inventory, world);
     }
 
     /**
@@ -62,7 +63,7 @@ public class Player extends AbstractCreature {
      * @param coordinate
      */
     @Override
-    public void onEnter(Coordinate coordinate) {
+    public void enter(Coordinate coordinate) {
         getAi().canEnter(coordinate, getWorld().getTile(coordinate));
     }
 
