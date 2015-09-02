@@ -16,7 +16,6 @@
  */
 package net.c2technology.roguezombie.creature.ai;
 
-import java.util.ArrayList;
 import java.util.List;
 import net.c2technology.roguezombie.creature.Player;
 import net.c2technology.roguezombie.world.Coordinate;
