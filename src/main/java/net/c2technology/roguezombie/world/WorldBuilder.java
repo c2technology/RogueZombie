@@ -17,11 +17,17 @@
 package net.c2technology.roguezombie.world;
 
 /**
+ * A {@code WorldBuilder} creates empty worlds.
  *
  * @author cryan
  */
 public interface WorldBuilder {
 
+    /**
+     * Builds a {@code World}
+     *
+     * @return
+     */
     public World build();
 
 }
