@@ -195,7 +195,7 @@ public class Play implements Screen {
             case 36://7 on the keypad (without Num Lock)
                 cardinal = Cardinal.NORTH_WEST;
                 break;
-            case KeyEvent.VK_Z: //NUM LOCK
+            case KeyEvent.VK_Z:
                 fogOfWar = !fogOfWar;
                 return this;
             default:

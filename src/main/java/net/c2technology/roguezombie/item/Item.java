@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2015 Chris Ryan
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,14 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.c2technology.roguezombie.world;
+package net.c2technology.roguezombie.item;
+
+import net.c2technology.roguezombie.world.Identifiable;
 
 /**
+ * An {@code Item} is something the {@code Player} can use that may help or hurt
+ * progress.
  *
- * @author cryan
+ * @author Chris Ryan
  */
-public interface WorldBuilder {
+public interface Item extends Identifiable {
 
-    public World build();
+    public String getName();
 
 }

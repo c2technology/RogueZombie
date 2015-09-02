@@ -1,7 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2015 Chris Ryan
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.c2technology.roguezombie.world.los;
 
@@ -12,7 +23,8 @@ import net.c2technology.roguezombie.world.World;
 /**
  * The FieldOfView is the memory of what a {@code Creature} has seen. The state
  * of the {@code Tile} is remembered as it once was and is not necessarily the
- * same upon returning.
+ * same upon returning. This is essentially a mapping mechanism for the
+ * consumer.
  *
  * @author cryan
  */
@@ -24,6 +36,12 @@ public class FieldOfView {
     private final int width;
     private final int height;
 
+    /**
+     * Creates the field of view for the given {@code World}. The view is
+     * initialized with all {@code Tile}s as {@link Tile#UNDISCOVERED}.
+     *
+     * @param world
+     */
     public FieldOfView(World world) {
         this.world = world;
         width = world.getWidth();
@@ -79,9 +97,6 @@ public class FieldOfView {
                 }
                 LineOfSight los = LineOfSight.getLineOfSight(origin, target);
                 for (Coordinate point : los) {
-//                    if (!world.isInBounds(point)) {
-//                        continue;
-//                    }
                     Tile tile = world.getTile(point);
                     int pointX = point.getX();
                     int pointY = point.getY();

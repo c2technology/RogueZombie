@@ -1,7 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/* 
+ * Copyright (C) 2015 Chris Ryan
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.c2technology.roguezombie.world.los;
 
@@ -21,10 +32,21 @@ public class LineOfSight implements Iterable<Coordinate> {
 
     private final List<Coordinate> coordinates;
 
+    /**
+     * A single line of sight based on the given {@code coordinates}.
+     *
+     * @param coordinates
+     */
     private LineOfSight(List<Coordinate> coordinates) {
         this.coordinates = coordinates;
     }
 
+    /**
+     * The {@code Iterator} for the {@code Coordinate} locations within the
+     * {@code LineOfSight}
+     *
+     * @return
+     */
     @Override
     public Iterator<Coordinate> iterator() {
         return this.coordinates.iterator();
@@ -58,7 +80,7 @@ public class LineOfSight implements Iterable<Coordinate> {
             case SOUTH_EAST:
             case EAST:
                 for (int x = x0 + 1; x <= x1; x++) {
-                    int y = getY(x0, x1, y0, y1, x);
+                    int y = getSlope(x0, x1, y0, y1, x);
                     coordinates.add(new Coordinate(x, y));
                 }
                 break;
@@ -67,7 +89,7 @@ public class LineOfSight implements Iterable<Coordinate> {
             case WEST:
                 //going left
                 for (int x = x0 - 1; x >= x1; x--) {
-                    int y = getY(x0, x1, y0, y1, x);
+                    int y = getSlope(x0, x1, y0, y1, x);
                     coordinates.add(new Coordinate(x, y));
                 }
                 break;
@@ -110,7 +132,18 @@ public class LineOfSight implements Iterable<Coordinate> {
         return a2 + b2 <= c2;
     }
 
-    private static int getY(int x0, int x1, int y0, int y1, int x) {
+    /**
+     * Calculates the slope based on Bresenham's line algorithm
+     *
+     * @param x0
+     * @param x1
+     * @param y0
+     * @param y1
+     * @param x
+     * @return
+     * @see https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+     */
+    private static int getSlope(int x0, int x1, int y0, int y1, int x) {
         return ((y1 - y0) / (x1 - x0)) * (x - x0) + y0;
     }
 }

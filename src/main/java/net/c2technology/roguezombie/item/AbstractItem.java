@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2015 Chris Ryan
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,67 +14,54 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.c2technology.roguezombie.world;
+package net.c2technology.roguezombie.item;
 
-import asciiPanel.AsciiPanel;
 import java.awt.Color;
+import java.util.UUID;
 
 /**
- * A location on the {@code World} map.
  *
- * @author cryan
+ * @author Chris Ryan
  */
-public enum Tile implements Entity {
+public abstract class AbstractItem implements Item {
 
-    FLOOR((char) 250, AsciiPanel.yellow, true),
-    WALL((char) 177, AsciiPanel.yellow, false),
-    UNDISCOVERED(' ', AsciiPanel.black, true),
-    BOUNDS('x', AsciiPanel.brightBlack, false);
-
+    private final UUID id;
+    private final String name;
     private final char glyph;
     private final Color color;
     private final boolean passable;
 
-    /**
-     * Enum constructor.
-     *
-     * @param glyph
-     * @param color
-     * @param passable
-     */
-    private Tile(char glyph, Color color, boolean passable) {
+    protected AbstractItem(UUID id, String name, char glyph, Color color, boolean passable) {
+        this.id = id;
+        this.name = name;
         this.glyph = glyph;
         this.color = color;
         this.passable = passable;
     }
 
-    /**
-     * The representation of the {@code Tile}
-     *
-     * @return
-     */
     @Override
-    public char getGlyph() {
-        return this.glyph;
+    public UUID getId() {
+        return this.id;
     }
 
-    /**
-     * The color of the {@code Tile}
-     *
-     * @return
-     */
+    @Override
+    public String getName() {
+        return this.name;
+    }
+
     @Override
     public Color getColor() {
         return this.color;
     }
 
-    /**
-     * Whether or not this {@code Tile} can be moved through.
-     *
-     * @return {@code true} if this {@code Tile} can be moved through
-     */
+    @Override
+    public char getGlyph() {
+        return this.glyph;
+    }
+
     @Override
     public boolean isPassable() {
-        return passable;
+        return this.passable;
     }
+
 }

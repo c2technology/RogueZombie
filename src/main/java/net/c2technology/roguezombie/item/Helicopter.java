@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2015 Chris Ryan
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,14 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.c2technology.roguezombie.world;
+package net.c2technology.roguezombie.item;
+
+import java.awt.Color;
+import java.util.UUID;
 
 /**
+ * This is the only exit for a {@code Player}. Once a {@code Player} reaches
+ * this, he will be free from the horror.
  *
- * @author cryan
+ * @author Chris Ryan
  */
-public interface WorldBuilder {
+public class Helicopter extends AbstractItem {
 
-    public World build();
+    public Helicopter() {
+        super(UUID.randomUUID(), "Helicopter", 'H', Color.CYAN, true);
+    }
 
 }

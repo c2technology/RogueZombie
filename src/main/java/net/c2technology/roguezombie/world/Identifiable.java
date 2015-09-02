@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2015 Chris Ryan
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,21 @@
  */
 package net.c2technology.roguezombie.world;
 
-/**
- *
- * @author cryan
- */
-public interface WorldBuilder {
+import java.util.UUID;
 
-    public World build();
+/**
+ * A {@code Identifiable} {@code Entity} has a unique handle allowing easy
+ * identification.
+ *
+ * @author Chris Ryan
+ */
+public interface Identifiable extends Entity {
+
+    /**
+     * The unique ID of this {@code Creature}.
+     *
+     * @return
+     */
+    public UUID getId();
 
 }
