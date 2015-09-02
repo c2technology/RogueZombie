@@ -36,6 +36,7 @@ import net.c2technology.roguezombie.world.World;
  */
 public abstract class AbstractCreature implements Creature {
 
+    //TODO: Migrate creature settings into D&D style (dex, int... etc)?
     private final UUID id;
     private final Color color;
     private final char glyph;
@@ -45,11 +46,17 @@ public abstract class AbstractCreature implements Creature {
     private Ai ai;
     private final CreatureType type;
     private final int visionRadius;
+    private final int maxHealth;
+    private int health;
+    private final int baseAttack;
+    private final int baseDefense;
+    private final String name;
 
     /**
      * An {@code AbstractCreature} is an "incomplete" {@code Creature} with the
      * basic requirements.
      *
+     * @param name
      * @param type
      * @param visionRadius
      * @param glyph
@@ -57,7 +64,8 @@ public abstract class AbstractCreature implements Creature {
      * @param inventory
      * @param world
      */
-    protected AbstractCreature(CreatureType type, int visionRadius, char glyph, Color color, Inventory inventory, World world) {
+    protected AbstractCreature(String name, CreatureType type, int visionRadius, char glyph, Color color, Inventory inventory, int health, int baseAttack, int baseDefense, World world) {
+        this.name = name;
         this.id = UUID.randomUUID();
         this.type = type;
         this.visionRadius = visionRadius;
@@ -65,6 +73,20 @@ public abstract class AbstractCreature implements Creature {
         this.color = color;
         this.inventory = inventory;
         this.world = world;
+        this.maxHealth = health;
+        this.health = health;
+        this.baseAttack = baseAttack;
+        this.baseDefense = baseDefense;
+    }
+
+    @Override
+    public boolean hasHealth() {
+        return this.health > 0;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
     }
 
     /**
@@ -184,7 +206,7 @@ public abstract class AbstractCreature implements Creature {
      * @param coordinate
      */
     @Override
-    public void forceMove(Coordinate coordinate) {
+    public void performMove(Coordinate coordinate) {
         this.coordinate = coordinate;
     }
 
@@ -207,11 +229,9 @@ public abstract class AbstractCreature implements Creature {
      */
     @Override
     public void move(Cardinal cardinal) {
-        Coordinate oldCoordinate = getCoordinate();
         Coordinate newCoordinate = new Coordinate(coordinate.getX() + cardinal.getOffsetX(), coordinate.getY() + cardinal.getOffsetY());
         if (getAi().canEnter(newCoordinate, getWorld().getTile(newCoordinate))) {
-            forceMove(newCoordinate);
-            getWorld().creatureMoved(this, oldCoordinate);
+            performMove(newCoordinate);
         } else {
             //We can't enter... is this an enemy encounter?
             Creature otherCreature = getWorld().getCreature(newCoordinate);
@@ -219,8 +239,48 @@ public abstract class AbstractCreature implements Creature {
                 //attack determines wether or not to actually attack
                 attack(otherCreature);
             }
-
         }
+    }
+
+    /**
+     * Delegates to {@code Ai} to attack the {@code other} {@code Creature}.
+     *
+     * @param other
+     */
+    @Override
+    public void attack(Creature other) {
+        getAi().attack(other);
+    }
+
+    @Override
+    public int getAttack() {
+        return this.baseAttack;
+    }
+
+    @Override
+    public int getArmor() {
+        return this.baseDefense;
+    }
+
+    @Override
+    public void modifyHealth(int adjustment) {
+        this.health += adjustment;
+    }
+
+    @Override
+    public int getHealth() {
+        return this.health;
+    }
+
+    @Override
+    public int getMaxHealth() {
+        return this.maxHealth;
+    }
+
+    @Override
+    public void notify(String message) {
+
+        ai.onNotify(message);
     }
 
 }

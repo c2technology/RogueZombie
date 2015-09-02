@@ -17,8 +17,10 @@
 package net.c2technology.roguezombie.world;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import net.c2technology.roguezombie.creature.Creature;
@@ -37,7 +39,7 @@ public class World {
     private final UUID[][] itemLocator;
     private final int width;
     private final int height;
-    private final UUID[][] creatureLocator;
+    private UUID[][] creatureLocator;
     private final Map<UUID, Creature> creatureRegistry;
     private final Map<UUID, Item> itemRegistry;
     private Player player;
@@ -73,19 +75,26 @@ public class World {
         if (isInBounds(coordinate)) {
             UUID creatureId = creatureLocator[coordinate.getX()][coordinate.getY()];
             //Is there a creature at this location?
-            if (creatureId != null && creatureRegistry.containsKey(creatureId)) {
-                return creatureRegistry.get(creatureId);
+            if (creatureId != null) {
+                if (creatureRegistry.containsKey(creatureId)) {
+                    return creatureRegistry.get(creatureId);
+                } else {
+                    System.out.println("Creature located but not in registry!");
+                }
+            }
+            if (player!=null){
+                if (player.getCoordinate().equals(coordinate)){
+                    return player;
+                }
             }
         }
         return null;
     }
 
     /**
-     * Removes an {@code Item} from the {@code World} if one exists at the given
-     * {@code coordinate}. If no {@code Item} exists, {@code null} is returned.
-     *
-     * Once this function is called, the {@code Item} is no longer available
-     * until it is added back to the {@code World}.
+     * Retrieves an {@code Item} from the {@code World} if one exists at the
+     * given {@code coordinate}. If no {@code Item} exists, {@code null} is
+     * returned.
      *
      * @param coordinate
      * @return
@@ -96,7 +105,7 @@ public class World {
             UUID itemId = itemLocator[coordinate.getX()][coordinate.getY()];
             //Is there a creature at this location?
             if (itemId != null && itemRegistry.containsKey(itemId)) {
-                return itemRegistry.remove(itemId);
+                return itemRegistry.get(itemId);
             }
         }
         return null;
@@ -170,33 +179,25 @@ public class World {
     }
 
     /**
-     * Removes a {@code Creature} from the {@code World} if it exists.
-     *
-     * @param creature
-     */
-    public void remove(Creature creature) {
-        Coordinate creatureLocation = creature.getCoordinate();
-        if (isInBounds(creatureLocation)) {
-            Creature dead = getCreature(creatureLocation);
-            if (dead != null) {
-                creatureRegistry.remove(dead.getId());
-                creatureLocator[dead.getCoordinate().getX()][dead.getCoordinate().getY()] = null;
-            }
-        }
-    }
-
-    /**
      * Ends the current turn and handles all end turn actions for the
      * {@code World}
      */
     public void endTurn() {
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                Creature creature = getCreature(new Coordinate(x, y));
-                if (creature != null) {
-                    creature.resolveTurn();
-                }
+        creatureLocator = new UUID[width][height];
+        List<UUID> deadCreatures = new ArrayList();
+        for (Creature creature : this.getCreatures()) {
+            //prune the dead things... well things that have no health...
+            if (creature.hasHealth()) {
+                creature.resolveTurn();
+                Coordinate newLocation = creature.getCoordinate();
+                creatureLocator[newLocation.getX()][newLocation.getY()] = creature.getId();
+            } else {
+                deadCreatures.add(creature.getId());
             }
+        }
+        player.notify(String.format("%s creatures were slain!", deadCreatures.size()));
+        for (UUID id : deadCreatures) {
+            creatureRegistry.remove(id);
         }
     }
 
@@ -270,18 +271,6 @@ public class World {
     }
 
     /**
-     * Updates the world state when a creature moves.
-     *
-     * @param creature
-     * @param oldCoordinate
-     */
-    public void creatureMoved(Creature creature, Coordinate oldCoordinate) {
-        Coordinate newCoordinate = creature.getCoordinate();
-        creatureLocator[oldCoordinate.getX()][oldCoordinate.getY()] = null;
-        creatureLocator[newCoordinate.getX()][newCoordinate.getY()] = creature.getId();
-    }
-
-    /**
      * Spawns the given {@code Creature} in a random location. If it does exist,
      * an additional {@code Creature} is not created but its location is
      * updated.
@@ -294,7 +283,7 @@ public class World {
         boolean added = false;
         Coordinate creatureLocation = getRandomSpawnableLocation();
         if (isInBounds(creatureLocation)) {
-            creature.forceMove(creatureLocation);
+            creature.performMove(creatureLocation);
             creatureRegistry.put(creature.getId(), creature);
             creatureLocator[creatureLocation.getX()][creatureLocation.getY()] = creature.getId();
             added = true;

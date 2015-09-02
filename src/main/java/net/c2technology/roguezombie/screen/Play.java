@@ -19,10 +19,11 @@ package net.c2technology.roguezombie.screen;
 import asciiPanel.AsciiPanel;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import net.c2technology.roguezombie.creature.Creature;
 import net.c2technology.roguezombie.creature.ClutterFactory;
 import net.c2technology.roguezombie.creature.Player;
-import net.c2technology.roguezombie.item.Item;
 import net.c2technology.roguezombie.world.Cardinal;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.Entity;
@@ -48,6 +49,8 @@ public class Play implements Screen {
     private final ClutterFactory clutterFactory;
     private final Player player;
     private boolean fogOfWar = true;
+    //TODO: Convert messaging to Listner/Observer Pattern
+    private final List<String> globalMessageQueue;
 
     /**
      * Default constructor
@@ -59,9 +62,10 @@ public class Play implements Screen {
         clutterFactory = new ClutterFactory();
         world = createWorld();
         fieldOfView = new FieldOfView(world);
-        player = clutterFactory.makePlayer(world, fieldOfView);
+        globalMessageQueue = new ArrayList();
+        player = clutterFactory.makePlayer(world, fieldOfView, globalMessageQueue);
 
-        player.forceMove(world.getRandomSpawnableLocation());
+        player.performMove(world.getRandomSpawnableLocation());
         world.setPlayer(player);
 
     }
@@ -126,17 +130,22 @@ public class Play implements Screen {
     public void display(AsciiPanel terminal) {
         Coordinate playerCoordinate = player.getCoordinate();
         fieldOfView.update(playerCoordinate, player.getVisionRadius());
+
         displayWorld(terminal);
+        displayMessages(terminal);
         Coordinate upperLeftPosition = getTopLeft();
+
         terminal.write(player.getGlyph(), playerCoordinate.getX() - upperLeftPosition.getX(), playerCoordinate.getY() - upperLeftPosition.getY(), player.getColor());
         terminal.write("Toggle Fog of War: Z", 0, 21);
+        terminal.write(String.format("Health: %s/%s", player.getHealth(), player.getMaxHealth()), 0, 22);
+
         terminal.write("X: " + playerCoordinate.getX(), 25, 21);
         terminal.write("Y: " + playerCoordinate.getY(), 25, 22);
 
         terminal.write("Use the Num Pad or Arrows to move", 36, 21);
-        terminal.write("\\|/", 74, 21);
-        terminal.write("-+-", 74, 22);
-        terminal.write("/|\\", 74, 23);
+        terminal.write("789", 74, 21);
+        terminal.write("4 5", 74, 22);
+        terminal.write("123", 74, 23);
         terminal.write("Total Zombies: " + world.getCreatures().size(), 0, 23);
     }
 
@@ -149,6 +158,9 @@ public class Play implements Screen {
      */
     @Override
     public Screen respond(KeyEvent key) {
+        if (!player.hasHealth()) {
+            return new Lose();
+        }
         Cardinal cardinal;
         switch (key.getKeyCode()) {
             case KeyEvent.VK_ESCAPE:
@@ -246,5 +258,19 @@ public class Play implements Screen {
 //        }
         //Currently only making a helicopter (the exit)
         world.addItem(clutterFactory.makeItem(world));
+    }
+
+    /**
+     * Writes all messages added to the global message queue then clears the
+     * queue,
+     *
+     * @param terminal
+     */
+    private void displayMessages(AsciiPanel terminal) {
+        int top = screenHeight - globalMessageQueue.size();
+        for (int i = 0; i < globalMessageQueue.size(); i++) {
+            terminal.writeCenter(globalMessageQueue.get(i), top + i);
+        }
+        globalMessageQueue.clear();
     }
 }

@@ -33,4 +33,11 @@ public interface Identifiable extends Entity {
      */
     public UUID getId();
 
+    /**
+     * The name of the {@code Creature}.
+     *
+     * @return
+     */
+    public String getName();
+
 }

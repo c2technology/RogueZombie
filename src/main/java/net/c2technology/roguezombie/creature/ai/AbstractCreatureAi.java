@@ -16,6 +16,7 @@
  */
 package net.c2technology.roguezombie.creature.ai;
 
+import java.util.List;
 import net.c2technology.roguezombie.creature.Creature;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.Tile;
@@ -40,6 +41,8 @@ public abstract class AbstractCreatureAi<T extends Creature> implements Ai<T> {
      */
     protected AbstractCreatureAi(T me) {
         this.self = me;
+        //WARNING: Leak of this to another object before this is completely constructed.
+        //This does not currently cause a race condition as this is the last step in creating "this".
         this.self.setAi(this);
     }
 
@@ -50,6 +53,9 @@ public abstract class AbstractCreatureAi<T extends Creature> implements Ai<T> {
      */
     @Override
     public void resolveTurn() {
+        if (self.getHealth() <= 0) {
+            self.notify("You have died!");
+        }
     }
 
     /**
@@ -60,7 +66,14 @@ public abstract class AbstractCreatureAi<T extends Creature> implements Ai<T> {
      */
     @Override
     public void attack(Creature other) {
-        self.getWorld().remove(other);
+        int damage = Math.max(0, self.getAttack() - other.getArmor());
+        other.modifyHealth(-damage);
+        self.notify(String.format("You attack %s for %s damage!", other.getName(), damage));
+        other.notify(String.format("%s has attacked you for %s damage!", self.getName(), damage));
+        if (other.getHealth() <= 0) {
+            self.notify(String.format("%s has died!", other.getName()));
+            other.notify("You have died!");
+        }
     }
 
     /**
@@ -106,6 +119,16 @@ public abstract class AbstractCreatureAi<T extends Creature> implements Ai<T> {
         }
         //We have reached the target LOS and have not hit an impassible object. Whatever we were looking at, we can see.
         return true;
+    }
+
+    /**
+     * By default, all {@code Creature}s ignore messages.
+     *
+     * @param message
+     */
+    @Override
+    public void onNotify(String message) {
+        //Ignore
     }
 
 }

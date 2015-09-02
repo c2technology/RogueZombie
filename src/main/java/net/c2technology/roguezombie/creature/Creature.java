@@ -39,6 +39,13 @@ public interface Creature extends Identifiable {
     public void move(Cardinal cardinal);
 
     /**
+     * Returns {@code true} if this {@code Creature} still has health.
+     *
+     * @return
+     */
+    public boolean hasHealth();
+
+    /**
      * Resolves this {@code Creature}'s turn
      *
      */
@@ -71,7 +78,7 @@ public interface Creature extends Identifiable {
      *
      * @param coordinate
      */
-    public void forceMove(Coordinate coordinate);
+    public void performMove(Coordinate coordinate);
 
     /**
      * The {@code World} this {@code Creature} belongs in.
@@ -103,6 +110,13 @@ public interface Creature extends Identifiable {
     public void attack(Creature creature);
 
     /**
+     * The combined damage output of the {@code Creature}.
+     *
+     * @return
+     */
+    public int getAttack();
+
+    /**
      * Determines if this {@code Creature} can see the given {@code coordinate}.
      * Factors within the {@code Creature} may affect this and may not be
      * guaranteed to always return the same result.
@@ -130,4 +144,40 @@ public interface Creature extends Identifiable {
 //        if (hp < 1)
 //         world.remove(this);
 //    }
+    /**
+     * The armor value of the {@code Creature}.
+     *
+     * @return
+     */
+    public int getArmor();
+
+    /**
+     * The current health of this {@code Creature}
+     *
+     * @return
+     */
+    public int getHealth();
+
+    /**
+     * The maximum health of this {@code Creature}
+     *
+     * @return
+     */
+    public int getMaxHealth();
+
+    /**
+     * Adjusts the current health of this {@code Creature} by the
+     * {@code adjustment} amount.
+     *
+     * @param adjustment A positive or negative number
+     */
+    public void modifyHealth(int adjustment);
+
+    /**
+     * Generic notification of nearby events to the {@code Creature}
+     *
+     * @param message The message to send
+     */
+    public void notify(String message);
+
 }

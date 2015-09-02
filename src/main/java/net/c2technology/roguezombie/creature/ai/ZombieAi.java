@@ -60,8 +60,7 @@ public abstract class ZombieAi extends AbstractCreatureAi<Zombie> {
     @Override
     public void attack(Creature other) {
         if (other.getCreatureType() != self.getCreatureType()) {
-            //TODO: Implement damage/defense
-            self.getWorld().remove(other);
+            super.attack(other);
         }
     }
 }

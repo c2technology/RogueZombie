@@ -58,4 +58,12 @@ public interface Ai<T> {
      * @return
      */
     public boolean canSee(Coordinate coordinate);
+
+    /**
+     * A message to be processed by the {@code Ai}. This is typically an event
+     * that has happened nearby.
+     *
+     * @param message
+     */
+    public void onNotify(String message);
 }

@@ -16,6 +16,8 @@
  */
 package net.c2technology.roguezombie.creature.ai;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.c2technology.roguezombie.creature.Player;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.los.FieldOfView;
@@ -29,6 +31,8 @@ import net.c2technology.roguezombie.world.los.FieldOfView;
 public class PlayerAi extends AbstractCreatureAi<Player> {
 
     private final FieldOfView fieldOfView;
+    //This is passed by reference so the caller has a handle on any messages added
+    protected final List<String> messages;
 
     /**
      * Creates the {@code PlayerAi} with a default {@code fieldOfView}.
@@ -36,9 +40,10 @@ public class PlayerAi extends AbstractCreatureAi<Player> {
      * @param me
      * @param fieldOfView
      */
-    public PlayerAi(Player me, FieldOfView fieldOfView) {
+    public PlayerAi(Player me, FieldOfView fieldOfView, List<String> globalMessageQueue) {
         super(me);
         this.fieldOfView = fieldOfView;
+        this.messages = globalMessageQueue;
     }
 
     /**
@@ -62,4 +67,13 @@ public class PlayerAi extends AbstractCreatureAi<Player> {
         return fieldOfView.isVisible(target);
     }
 
+    /**
+     * Add the message to the global message queue.
+     *
+     * @param message
+     */
+    @Override
+    public void onNotify(String message) {
+        messages.add(message);
+    }
 }

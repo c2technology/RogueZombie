@@ -40,9 +40,12 @@ public class Zombie extends AbstractCreature {
      * @param glyph The representation of this {@code Zombie}
      * @param color The color of this {@code Zombie}
      * @param inventory The {@code Inventory} of this {@code Zombie}
+     * @param health The max starting health of this {@code Player}
+     * @param baseAttack The base attack value for this {@code Player}
+     * @param baseDefense the base defense value of this {@code Player}
      */
-    public Zombie(World world, char glyph, Color color, Inventory inventory) {
-        super(CreatureType.MOB, glyph, glyph, color, inventory, world);
+    public Zombie(World world, char glyph, Color color, Inventory inventory, int health, int baseAttack, int baseDefense) {
+        super("Generic Zombie", CreatureType.MOB, glyph, glyph, color, inventory, health, baseAttack, baseDefense, world);
     }
 
     /**
@@ -54,9 +57,7 @@ public class Zombie extends AbstractCreature {
     @Override
     public void enter(Coordinate coordinate) {
         if (getAi().canEnter(coordinate, getWorld().getTile(coordinate))) {
-            Coordinate oldCoordinate = this.getCoordinate();
-            this.forceMove(coordinate);
-            getWorld().creatureMoved(this, oldCoordinate);
+            this.performMove(coordinate);
         }
 
     }

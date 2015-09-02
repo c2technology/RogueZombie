@@ -20,6 +20,7 @@ import net.c2technology.roguezombie.creature.enemy.Zombie;
 import net.c2technology.roguezombie.creature.ai.PlayerAi;
 //import net.c2technology.roguezombie.creature.ai.DumbZombieAi;
 import asciiPanel.AsciiPanel;
+import java.util.List;
 import net.c2technology.roguezombie.creature.ai.DumbZombieAi;
 import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
 import net.c2technology.roguezombie.creature.ai.ZombieAi;
@@ -56,13 +57,14 @@ public class ClutterFactory {
      * @param world the {@code World} in which the new {@code Player} belongs.
      * @param fieldOfView the originating {@code FieldOfView} for the player.
      * This could already have certain areas exposed if desired.
+     * @param globalMessageQueue the global message system
      * @return
      */
-    public Player makePlayer(World world, FieldOfView fieldOfView) {
+    public Player makePlayer(World world, FieldOfView fieldOfView, List<String> globalMessageQueue) {
 
-        Player player = new Player(world, '@', AsciiPanel.brightWhite, makeInventory(), 2);
+        Player player = new Player(world, '@', AsciiPanel.brightWhite, makeInventory(), 100, RandomNumber.between(15, 30), RandomNumber.between(0, 10), 2);
         //TODO: This seems a bit wonky to give the subject to the AI.
-        PlayerAi playerAi = new PlayerAi(player, fieldOfView);
+        PlayerAi playerAi = new PlayerAi(player, fieldOfView, globalMessageQueue);
         return player;
     }
 
@@ -76,7 +78,7 @@ public class ClutterFactory {
     public Creature makeCreature(World world) {
 
         //TODO: Add a real inventory to Zombies.
-        Zombie zombie = new Zombie(world, 'Z', AsciiPanel.green, new BasicInventory(0));
+        Zombie zombie = new Zombie(world, 'Z', AsciiPanel.green, new BasicInventory(0), RandomNumber.between(50, 100), RandomNumber.between(5, 25), RandomNumber.between(0, 5));
         //TODO: This seems a bit wonky to give the subject to the AI.
         ZombieAi zombieAi = Math.random() > .5 ? new DumbZombieAi(zombie) : new SmartZombieAi(zombie);
         return zombie;

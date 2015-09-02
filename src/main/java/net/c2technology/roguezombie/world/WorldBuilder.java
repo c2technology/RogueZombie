@@ -24,7 +24,7 @@ package net.c2technology.roguezombie.world;
 public interface WorldBuilder {
 
     /**
-     * Builds a {@code World}
+     * Builds a {@code World}.
      *
      * @return
      */

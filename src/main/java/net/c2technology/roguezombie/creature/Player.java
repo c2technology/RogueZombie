@@ -41,20 +41,14 @@ public class Player extends AbstractCreature {
      * @param glyph The representation of this {@code Player}
      * @param color The color if this {@code Player}
      * @param inventory The starting {@code Inventory} of this {@code Player}
+     * @param health The max starting health of this {@code Player}
+     * @param baseAttack The base attack value for this {@code Player}
+     * @param baseDefense the base defense value of this {@code Player}
      * @param visionRadius The range of vision of this {@code Player}
-     */
-    public Player(World world, char glyph, Color color, Inventory inventory, int visionRadius) {
-        super(CreatureType.PLAYER, visionRadius, glyph, color, inventory, world);
-    }
-
-    /**
-     * Causes this {@code Player} to attack.
      *
-     * @param other the {@code Creature} to attack.
      */
-    @Override
-    public void attack(Creature other) {
-        getAi().attack(other);
+    public Player(World world, char glyph, Color color, Inventory inventory, int health, int baseAttack, int baseDefense, int visionRadius) {
+        super("Hero", CreatureType.PLAYER, visionRadius, glyph, color, inventory, health, baseAttack, baseDefense, world);
     }
 
     /**
