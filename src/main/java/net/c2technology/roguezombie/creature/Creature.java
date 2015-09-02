@@ -46,6 +46,13 @@ public interface Creature extends Identifiable {
     public boolean hasHealth();
 
     /**
+     * Returns the {@code Inventory} of this {@code Creature}
+     *
+     * @return
+     */
+    public Inventory getInventory();
+
+    /**
      * Resolves this {@code Creature}'s turn
      *
      */

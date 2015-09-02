@@ -24,10 +24,12 @@ import java.util.List;
 import net.c2technology.roguezombie.creature.Creature;
 import net.c2technology.roguezombie.creature.ClutterFactory;
 import net.c2technology.roguezombie.creature.Player;
+import net.c2technology.roguezombie.item.Item;
 import net.c2technology.roguezombie.world.Cardinal;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.Entity;
 import net.c2technology.roguezombie.world.RandomNumber;
+import net.c2technology.roguezombie.world.Tile;
 import net.c2technology.roguezombie.world.World;
 import net.c2technology.roguezombie.world.dungeon.DungeonBuilder;
 import net.c2technology.roguezombie.world.los.FieldOfView;
@@ -51,6 +53,7 @@ public class Play implements Screen {
     private boolean fogOfWar = true;
     //TODO: Convert messaging to Listner/Observer Pattern
     private final List<String> globalMessageQueue;
+    private final Item winItem;
 
     /**
      * Default constructor
@@ -64,8 +67,10 @@ public class Play implements Screen {
         fieldOfView = new FieldOfView(world);
         globalMessageQueue = new ArrayList();
         player = clutterFactory.makePlayer(world, fieldOfView, globalMessageQueue);
-
+        winItem = clutterFactory.makeWinItem();
         player.performMove(world.getRandomSpawnableLocation());
+        world.addItem(winItem);
+
         world.setPlayer(player);
 
     }
@@ -136,17 +141,18 @@ public class Play implements Screen {
         Coordinate upperLeftPosition = getTopLeft();
 
         terminal.write(player.getGlyph(), playerCoordinate.getX() - upperLeftPosition.getX(), playerCoordinate.getY() - upperLeftPosition.getY(), player.getColor());
-        terminal.write("Toggle Fog of War: Z", 0, 21);
-        terminal.write(String.format("Health: %s/%s", player.getHealth(), player.getMaxHealth()), 0, 22);
 
-        terminal.write("X: " + playerCoordinate.getX(), 25, 21);
-        terminal.write("Y: " + playerCoordinate.getY(), 25, 22);
+        terminal.write(String.format("Health: %s/%s", player.getHealth(), player.getMaxHealth()), 0, 21);
+        terminal.write(String.format("Armor: %s", player.getArmor()), 0, 22);
+        terminal.write(String.format("Attack: %s", player.getAttack()), 0, 23);
 
-        terminal.write("Use the Num Pad or Arrows to move", 36, 21);
-        terminal.write("789", 74, 21);
-        terminal.write("4 5", 74, 22);
-        terminal.write("123", 74, 23);
-        terminal.write("Total Zombies: " + world.getCreatures().size(), 0, 23);
+        terminal.write("F: Toggle Fog of War", 17, 21);
+        terminal.write("[ENTER]: Pick up Item", 17, 22);
+        terminal.write(String.format("Current Location: %s, %s", player.getCoordinate().getX(), player.getCoordinate().getY()), 17, 23);
+
+        terminal.write("Use the Num Pad or Arrows to move", 45, 21);
+        terminal.write("You can move in any direction!", 45, 22);
+        terminal.write("Total Zombies: " + world.getCreatures().size(), 45, 23);
     }
 
     /**
@@ -161,62 +167,97 @@ public class Play implements Screen {
         if (!player.hasHealth()) {
             return new Lose();
         }
-        Cardinal cardinal;
+
         switch (key.getKeyCode()) {
-            case KeyEvent.VK_ESCAPE:
-                return new Lose();//TODO: Show Player results (close calls, how close they were to the helicopter, etc)
-            case KeyEvent.VK_ENTER:
-                return new Win();//TODO: Show Player results (close calls, etc)
             //North
             case KeyEvent.VK_UP:
             case 104://8 on the keypad
-                cardinal = Cardinal.NORTH;
+                player.move(Cardinal.NORTH);
                 break;
             //North East
             case 105://9 on the keypad
             case 33://9 on the keypad (without Num Lock)
-                cardinal = Cardinal.NORTH_EAST;
+                player.move(Cardinal.NORTH_EAST);
                 break;
             //East
             case KeyEvent.VK_RIGHT:
             case 102://6 on the keypad
-                cardinal = Cardinal.EAST;
+                player.move(Cardinal.EAST);
                 break;
             //South East                
             case 99://3 on the keypad
             case 34://3 on the keypad (without Num Lock)
-                cardinal = Cardinal.SOUTH_EAST;
+                player.move(Cardinal.SOUTH_EAST);
                 break;
             //South
             case KeyEvent.VK_DOWN:
             case 98://2 on the keypad
-                cardinal = Cardinal.SOUTH;
+                player.move(Cardinal.SOUTH);
                 break;
             //South West
             case 97://1 on the keypad
             case 35://1 on the keypad (without Num Lock)
-                cardinal = Cardinal.SOUTH_WEST;
+                player.move(Cardinal.SOUTH_WEST);
                 break;
             //West
             case KeyEvent.VK_LEFT:
             case 100://4 on the keypad
-                cardinal = Cardinal.WEST;
+                player.move(Cardinal.WEST);
                 break;
             //North West
             case 103://4 on the keypad
             case 36://7 on the keypad (without Num Lock)
-                cardinal = Cardinal.NORTH_WEST;
+                player.move(Cardinal.NORTH_WEST);
                 break;
-            case KeyEvent.VK_Z:
+            //Pickup
+            case KeyEvent.VK_ENTER:
+                player.pickup();
+                break;
+            //Toggle Fog of War
+            case KeyEvent.VK_F:
                 fogOfWar = !fogOfWar;
                 return this;
+
+            case KeyEvent.VK_Q:
+                return new Lose();
+            case KeyEvent.VK_W:
+                return new Win();
             default:
+                //don't do anything if an unknown key was pressed
                 return this;
         }
-        world.move(player, cardinal);
         world.endTurn();
-
+        if (onExit()) {
+            if (isExitEligible()) {
+                return new Win();
+            }
+            player.notify("Hmmm... I can't leave without the cure....");
+        }
         return this;
+    }
+
+    /**
+     * Determines if the {@code Player} is currently on the exit {@code Tile}.
+     *
+     * @return
+     */
+    private boolean onExit() {
+        return world.getTile(player.getCoordinate()) == Tile.EXIT;
+    }
+
+    /**
+     * Determines if the {@code Player} can exit. To be eligible for exit, the
+     * {@code Player} must have the "Zombie Cure."
+     *
+     * @return
+     */
+    private boolean isExitEligible() {
+        for (Item item : player.getInventory().getItems()) {
+            if (item.equals(winItem)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -256,8 +297,6 @@ public class Play implements Screen {
 //        Item item = clutterFactory.makeItem(world);
 //            world.addItem(item);
 //        }
-        //Currently only making a helicopter (the exit)
-        world.addItem(clutterFactory.makeItem(world));
     }
 
     /**

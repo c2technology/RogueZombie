@@ -16,6 +16,7 @@
  */
 package net.c2technology.roguezombie.creature;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -54,6 +55,11 @@ public class BasicInventory implements Inventory {
     @Override
     public boolean isFull() {
         return items.size() == capacity;
+    }
+
+    @Override
+    public Collection<Item> getItems() {
+        return this.items.values();
     }
 
 }

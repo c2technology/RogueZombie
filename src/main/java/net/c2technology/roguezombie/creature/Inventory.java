@@ -16,6 +16,7 @@
  */
 package net.c2technology.roguezombie.creature;
 
+import java.util.Collection;
 import net.c2technology.roguezombie.item.Item;
 
 /**
@@ -30,5 +31,7 @@ public interface Inventory {
     public void remove(Item item);
 
     public boolean isFull();
+
+    public Collection<Item> getItems();
 
 }

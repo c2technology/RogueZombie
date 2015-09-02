@@ -20,15 +20,16 @@ import java.awt.Color;
 import java.util.UUID;
 
 /**
- * This is the only exit for a {@code Player}. Once a {@code Player} reaches
- * this, he will be free from the horror.
+ * This is the objective item and an exit condition for the {@code Player}. Once
+ * a {@code Player} reaches this, she will be able to exit by returning to the
+ * exit.
  *
  * @author Chris Ryan
  */
-public class Helicopter extends AbstractItem {
+public class President extends AbstractItem {
 
-    public Helicopter() {
-        super(UUID.randomUUID(), "Helicopter", 'H', Color.CYAN, true);
+    public President() {
+        super(UUID.randomUUID(), "President", 'P', Color.RED, true);
     }
 
 }

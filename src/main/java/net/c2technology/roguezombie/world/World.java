@@ -82,8 +82,8 @@ public class World {
                     System.out.println("Creature located but not in registry!");
                 }
             }
-            if (player!=null){
-                if (player.getCoordinate().equals(coordinate)){
+            if (player != null) {
+                if (player.getCoordinate().equals(coordinate)) {
                     return player;
                 }
             }
@@ -99,7 +99,7 @@ public class World {
      * @param coordinate
      * @return
      */
-    public Item getItem(Coordinate coordinate) {
+    private Item getItem(Coordinate coordinate) {
         //TODO: A more generic registry object can be made to handle the various types of entity types (item, creature, etc).
         if (isInBounds(coordinate)) {
             UUID itemId = itemLocator[coordinate.getX()][coordinate.getY()];
@@ -195,7 +195,6 @@ public class World {
                 deadCreatures.add(creature.getId());
             }
         }
-        player.notify(String.format("%s creatures were slain!", deadCreatures.size()));
         for (UUID id : deadCreatures) {
             creatureRegistry.remove(id);
         }
@@ -341,21 +340,49 @@ public class World {
     }
 
     /**
-     * Adds an item to this {@code World}. Returns {@code true} if successful.
+     * Adds an item to this {@code World} at a randomly selected location.
+     * Returns {@code true} if successful.
      *
      * @param item
      * @return
      */
     public boolean addItem(Item item) {
+        return addItem(item, getRandomSpawnableLocation());
+    }
+
+    /**
+     * Adds an item to this {@code World}. Returns {@code true} if successful.
+     *
+     * @param item
+     * @param coordinate
+     * @return
+     */
+    public boolean addItem(Item item, Coordinate coordinate) {
         //TODO: Make a spawn method that spawns within a given range of a given coordinate
         boolean added = false;
-        Coordinate location = getRandomSpawnableLocation();
-        if (isInBounds(location)) {
+
+        if (isInBounds(coordinate)) {
             itemRegistry.put(item.getId(), item);
-            itemLocator[location.getX()][location.getY()] = item.getId();
+            itemLocator[coordinate.getX()][coordinate.getY()] = item.getId();
             added = true;
         }
         return added;
     }
 
+    /**
+     * Removes the given {@code Item} from the world at the given
+     * {@code Coordinate}. If not {@code Item} exists, {@code null} is returned.
+     *
+     * @param coordinate
+     * @return
+     */
+    public Item removeItem(Coordinate coordinate) {
+        if (isInBounds(coordinate)) {
+            UUID itemId = this.itemLocator[coordinate.getX()][coordinate.getY()];
+
+            this.itemLocator[coordinate.getX()][coordinate.getY()] = null;
+            return itemRegistry.remove(itemId);
+        }
+        return null;
+    }
 }

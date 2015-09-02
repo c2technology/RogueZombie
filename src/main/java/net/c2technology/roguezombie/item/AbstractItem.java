@@ -17,6 +17,7 @@
 package net.c2technology.roguezombie.item;
 
 import java.awt.Color;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -24,6 +25,28 @@ import java.util.UUID;
  * @author Chris Ryan
  */
 public abstract class AbstractItem implements Item {
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AbstractItem other = (AbstractItem) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
+    }
 
     private final UUID id;
     private final String name;

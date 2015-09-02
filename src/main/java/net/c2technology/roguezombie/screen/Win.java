@@ -17,6 +17,7 @@
 package net.c2technology.roguezombie.screen;
 
 import asciiPanel.AsciiPanel;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 
 /**
@@ -35,8 +36,39 @@ public class Win implements Screen {
     @Override
     public void display(AsciiPanel terminal) {
         //FIXME: Show the end results to the user. Give them an AWESOME ASCII HELICOPTER!
-        terminal.write("You won.", 1, 1);
-        terminal.writeCenter("-- press [enter] to restart --", 22);
+        String shortStripe = "                       ";
+        String longStripe = "                                                ";
+        String star1 = " *   *   *   *   *   *   ";
+        String star2 = "   *   *   *   *   *   * ";
+
+        terminal.write(star1, 30, 1, Color.WHITE, Color.BLUE);
+        terminal.write(star2, 30, 2, Color.WHITE, Color.BLUE);
+        terminal.write(star1, 30, 3, Color.WHITE, Color.BLUE);
+        terminal.write(star2, 30, 4, Color.WHITE, Color.BLUE);
+        terminal.write(star1, 30, 5, Color.WHITE, Color.BLUE);
+        terminal.write(star2, 30, 6, Color.WHITE, Color.BLUE);
+        terminal.write(star1, 30, 7, Color.WHITE, Color.BLUE);
+
+        terminal.write(shortStripe, 30 + star1.length(), 1, Color.RED, Color.RED);
+        terminal.write(shortStripe, 30 + star2.length(), 2, Color.WHITE, Color.WHITE);
+        terminal.write(shortStripe, 30 + star1.length(), 3, Color.RED, Color.RED);
+        terminal.write(shortStripe, 30 + star2.length(), 4, Color.WHITE, Color.WHITE);
+        terminal.write(shortStripe, 30 + star1.length(), 5, Color.RED, Color.RED);
+        terminal.write(shortStripe, 30 + star2.length(), 6, Color.WHITE, Color.WHITE);
+        terminal.write(shortStripe, 30 + star1.length(), 7, Color.RED, Color.RED);
+        terminal.write(longStripe, 30, 8, Color.WHITE, Color.WHITE);
+        terminal.write(longStripe, 30, 9, Color.RED, Color.RED);
+        terminal.write(longStripe, 30, 10, Color.WHITE, Color.WHITE);
+        terminal.write(longStripe, 30, 11, Color.RED, Color.RED);
+        terminal.write(longStripe, 30, 12, Color.WHITE, Color.WHITE);
+        terminal.write(longStripe, 30, 13, Color.RED, Color.RED);
+
+        terminal.write("Hey dudes, Thanks", 1, 2);
+        terminal.write("for rescuing me.", 5, 4);
+        terminal.write("Let's go for", 9, 6);
+        terminal.write("a burger...", 9, 8);
+
+        terminal.writeCenter("--> Press [ENTER] to Restart <--", 20);
     }
 
     /**
@@ -48,7 +80,7 @@ public class Win implements Screen {
      */
     @Override
     public Screen respond(KeyEvent key) {
-        return key.getKeyCode() == KeyEvent.VK_ENTER ? new Play() : this;
+        return key.getKeyCode() == KeyEvent.VK_ENTER ? new Start() : this;
     }
 
 }

@@ -26,6 +26,4 @@ import net.c2technology.roguezombie.world.Identifiable;
  */
 public interface Item extends Identifiable {
 
-    public String getName();
-
 }

@@ -92,6 +92,20 @@ public class DungeonBuilder extends AbstractWorldBuilder {
             }
             throw new RuntimeException("Failed to build world: " + e.getMessage(), e);
         }
+        addExit();
+    }
+
+    /**
+     * Adds the exit Tile to the world.
+     */
+    private void addExit() {
+        int x = -1;
+        int y = -1;
+        do {
+            x = (int) (Math.random() * getWidth());
+            y = (int) (Math.random() * getHeight());
+        } while (getTile(new Coordinate(x, y)) != Tile.FLOOR);
+        setTile(Tile.EXIT, new Coordinate(x, y));
     }
 
 }

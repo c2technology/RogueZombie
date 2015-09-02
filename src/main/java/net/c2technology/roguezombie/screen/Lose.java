@@ -17,6 +17,7 @@
 package net.c2technology.roguezombie.screen;
 
 import asciiPanel.AsciiPanel;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 
 /**
@@ -36,8 +37,17 @@ public class Lose implements Screen {
      */
     @Override
     public void display(AsciiPanel terminal) {
-        terminal.write("You lost.", 1, 1);
-        terminal.writeCenter("-- press [enter] to restart --", 22);
+        terminal.writeCenter("You were not a bad enough dude to save the president.", 6);
+        terminal.writeCenter("But you did make for a tasty snack.", 8);
+        terminal.write("        .__---~~~(~~-_.", 1, 13, Color.PINK);
+        terminal.write("     _-'  ) -~~- ) _-\")_", 1, 14, Color.PINK);
+        terminal.write("    (  ( `-,_..`.,_--_ '_,)_", 1, 15, Color.PINK);
+        terminal.write("   (  -_)  ( -_-~  -_ `,    )", 1, 16, Color.PINK);
+        terminal.write("   (_ -_ _-~-__-~`, ,' )__-'))--___--~~~--__--~~--___--__..", 1, 17, Color.PINK);
+        terminal.write("   _ ~`_-'( (____;--==,,_))))--___--~~~--__--~~--__----~~~'`=__-~+_-_.", 1, 18, Color.PINK);
+        terminal.write("            `````      `-_(())_-~  ", 1, 19, Color.PINK);
+
+        terminal.writeCenter("--> Press [ENTER] to Try Again <--", 22);
     }
 
     /**

@@ -36,9 +36,18 @@ public class Start implements Screen {
      */
     @Override
     public void display(AsciiPanel terminal) {
-        //FIXME: Write the instructions here!!!
-        terminal.write("Rogue Zombie!!!", 1, 1);
-        terminal.writeCenter("-- Press [Enter] to Start --", 22);
+        terminal.write("   __                          _____                _     _      ", 5, 1);
+        terminal.write("  /__\\ ___   __ _ _   _  ___  / _  / ___  _ __ ___ | |__ (_) ___ ", 5, 2);
+        terminal.write(" / \\/// _ \\ / _` | | | |/ _ \\ \\// / / _ \\| '_ ` _ \\| '_ \\| |/ _ \\", 5, 3);
+        terminal.write("/ _  \\ (_) | (_| | |_| |  __/  / //\\ (_) | | | | | | |_) | |  __/", 5, 4);
+        terminal.write("\\/ \\_/\\___/ \\__, |\\__,_|\\___| /____/\\___/|_| |_| |_|_.__/|_|\\___|", 5, 5);
+        terminal.write("            |___/                                                ", 5, 6);
+        terminal.writeCenter("Washington DC has been overrun by zombies.", 10);
+        terminal.writeCenter("ARE YOU A BAD ENOUGH DUDE TO SAVE THE PRESIDENT?", 12);
+
+        terminal.writeCenter("--> Press [ENTER] to Start <--", 15);
+        terminal.writeCenter("(C) 2015, Chris Ryan ", 20);
+
     }
 
     /**

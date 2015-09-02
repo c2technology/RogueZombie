@@ -18,6 +18,7 @@ package net.c2technology.roguezombie.creature;
 
 import net.c2technology.roguezombie.creature.ai.Ai;
 import java.awt.Color;
+import java.util.Objects;
 import java.util.UUID;
 import net.c2technology.roguezombie.item.Item;
 import net.c2technology.roguezombie.world.Cardinal;
@@ -80,6 +81,11 @@ public abstract class AbstractCreature implements Creature {
     }
 
     @Override
+    public Inventory getInventory() {
+        return this.inventory;
+    }
+
+    @Override
     public boolean hasHealth() {
         return this.health > 0;
     }
@@ -104,12 +110,19 @@ public abstract class AbstractCreature implements Creature {
 
     @Override
     public void pickup() {
-        inventory.add(this.world.getItem(getCoordinate()));
+        //TODO: Implement drop and allow Creatures to pickup items.. Could be useful for bait, barricades, etc.
+        Item item = this.world.removeItem(getCoordinate());
+        if (item != null) {
+            notify(String.format("You pick up %s", item.getName()));
+            inventory.add(item);
+        } else {
+            notify("You stare at the ground, hoping for something to appear...");
+        }
     }
 
     @Override
     public void drop(Item item) {
-        world.addItem(item);
+        world.addItem(item, getCoordinate());
         inventory.remove(item);
     }
 
@@ -235,11 +248,33 @@ public abstract class AbstractCreature implements Creature {
         } else {
             //We can't enter... is this an enemy encounter?
             Creature otherCreature = getWorld().getCreature(newCoordinate);
-            if (otherCreature != null) {
+            if (otherCreature != null && !this.equals(otherCreature)) {
                 //attack determines wether or not to actually attack
                 attack(otherCreature);
             }
         }
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 83 * hash + Objects.hashCode(this.id);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AbstractCreature other = (AbstractCreature) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
     }
 
     /**

@@ -16,7 +16,6 @@
  */
 package net.c2technology.roguezombie.world;
 
-import asciiPanel.AsciiPanel;
 import java.awt.Color;
 
 /**
@@ -26,10 +25,11 @@ import java.awt.Color;
  */
 public enum Tile implements Entity {
 
-    FLOOR((char) 250, AsciiPanel.yellow, true),
-    WALL((char) 177, AsciiPanel.yellow, false),
-    UNDISCOVERED(' ', AsciiPanel.black, true),
-    BOUNDS('x', AsciiPanel.brightBlack, false);
+    FLOOR((char) 250, Color.WHITE, true),
+    EXIT('H', Color.CYAN, true),
+    WALL((char) 177, Color.WHITE, false),
+    UNDISCOVERED(' ', Color.BLACK, true),
+    BOUNDS('#', Color.BLACK, false);
 
     private final char glyph;
     private final Color color;

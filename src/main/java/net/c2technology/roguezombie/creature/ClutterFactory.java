@@ -24,7 +24,7 @@ import java.util.List;
 import net.c2technology.roguezombie.creature.ai.DumbZombieAi;
 import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
 import net.c2technology.roguezombie.creature.ai.ZombieAi;
-import net.c2technology.roguezombie.item.Helicopter;
+import net.c2technology.roguezombie.item.President;
 import net.c2technology.roguezombie.item.Item;
 import net.c2technology.roguezombie.world.RandomNumber;
 //import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
@@ -85,16 +85,19 @@ public class ClutterFactory {
     }
 
     /**
-     * Creates an {@code Item}. The new {@code Item} has a randomly selected
-     * {@code Ai}.
+     * Creates the {@code Item} required to win.
      *
-     * @param world The {@code World} in which the new {@code Item} belongs.
      * @return
      */
-    public Item makeItem(World world) {
-        return new Helicopter();
+    public Item makeWinItem() {
+        return new President();
     }
 
+    /**
+     * Creates a randomly sized {@code Inventory}.
+     *
+     * @return
+     */
     private Inventory makeInventory() {
         return new BasicInventory(RandomNumber.between(5, 10));
     }
