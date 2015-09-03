@@ -59,7 +59,7 @@ public class Lose implements Screen {
      */
     @Override
     public Screen respond(KeyEvent key) {
-        return key.getKeyCode() == KeyEvent.VK_ENTER ? new Play() : this;
+        return key.getKeyCode() == KeyEvent.VK_ENTER ? new Start() : this;
     }
 
 }

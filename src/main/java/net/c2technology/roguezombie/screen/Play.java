@@ -231,7 +231,7 @@ public class Play implements Screen {
             if (isExitEligible()) {
                 return new Win();
             }
-            player.notify("Hmmm... I can't leave without the cure....");
+            player.notify("Hmmm... I can't leave without the President....");
         }
         return this;
     }
