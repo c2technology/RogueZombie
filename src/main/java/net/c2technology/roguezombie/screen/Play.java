@@ -71,6 +71,10 @@ public class Play implements Screen {
         player.performMove(world.getRandomSpawnableLocation());
         world.addItem(winItem);
 
+        for (Item item : clutterFactory.makeWeapons()) {
+            world.addItem(item);
+        }
+
         world.setPlayer(player);
 
     }

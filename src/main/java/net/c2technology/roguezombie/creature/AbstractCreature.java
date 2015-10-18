@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.util.Objects;
 import java.util.UUID;
 import net.c2technology.roguezombie.item.Item;
+import net.c2technology.roguezombie.item.Weapon;
 import net.c2technology.roguezombie.world.Cardinal;
 import net.c2technology.roguezombie.world.Coordinate;
 import net.c2technology.roguezombie.world.World;
@@ -289,7 +290,16 @@ public abstract class AbstractCreature implements Creature {
 
     @Override
     public int getAttack() {
-        return this.baseAttack;
+        int attack = this.baseAttack;
+        for (Item item : this.getInventory().getItems()) {
+            //TODO: Do this better
+            if (item instanceof Weapon) {
+                Weapon weapon = (Weapon) item;
+                attack += weapon.getDamage();
+                //TODO: Damage self based on weapon's penalty damage
+            }
+        }
+        return attack;
     }
 
     @Override

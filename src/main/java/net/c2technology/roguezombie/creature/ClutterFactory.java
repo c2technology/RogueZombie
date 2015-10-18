@@ -20,12 +20,16 @@ import net.c2technology.roguezombie.creature.enemy.Zombie;
 import net.c2technology.roguezombie.creature.ai.PlayerAi;
 //import net.c2technology.roguezombie.creature.ai.DumbZombieAi;
 import asciiPanel.AsciiPanel;
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 import net.c2technology.roguezombie.creature.ai.DumbZombieAi;
 import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
 import net.c2technology.roguezombie.creature.ai.ZombieAi;
 import net.c2technology.roguezombie.item.President;
 import net.c2technology.roguezombie.item.Item;
+import net.c2technology.roguezombie.item.Sword;
+import net.c2technology.roguezombie.item.Weapon;
 import net.c2technology.roguezombie.world.RandomNumber;
 //import net.c2technology.roguezombie.creature.ai.SmartZombieAi;
 //import net.c2technology.roguezombie.creature.ai.ZombieAi;
@@ -49,6 +53,12 @@ public class ClutterFactory {
      */
     public ClutterFactory() {
 
+    }
+
+    public List<Weapon> makeWeapons() {
+        List<Weapon> weapons = new ArrayList();
+        weapons.add(new Sword("Connor's Fire Sword", Color.ORANGE, 50, 10, 0));
+        return weapons;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chris
+ * Copyright (C) 2015 Chris Ryan
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import net.c2technology.roguezombie.item.Item;
  */
 public class BasicInventory implements Inventory {
 
-    private Map<UUID, Item> items;
+    private final Map<UUID, Item> items;
     private final int capacity;
 
     public BasicInventory(int capacity) {
