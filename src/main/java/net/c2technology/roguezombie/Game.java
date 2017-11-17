@@ -17,9 +17,12 @@
 package net.c2technology.roguezombie;
 
 import asciiPanel.AsciiPanel;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import javax.swing.JFrame;
+import net.c2technology.roguezombie.screen.ResizeableScreen;
 import net.c2technology.roguezombie.screen.Screen;
 import net.c2technology.roguezombie.screen.Start;
 
@@ -28,10 +31,10 @@ import net.c2technology.roguezombie.screen.Start;
  *
  * @author cryan
  */
-public class Game implements KeyListener {
+public class Game implements KeyListener, ComponentListener {
 
     private final AsciiPanel content;
-    private Screen context;
+    private Screen screenContext;
     private final JFrame window;
     private boolean started = false;
 
@@ -53,8 +56,10 @@ public class Game implements KeyListener {
      */
     public void start() {
         if (!started) {
-            context = new Start();
+
+            screenContext = new Start(20, 80);
             window.addKeyListener(this);
+            window.addComponentListener(this);
             this.repaint();
             started = true;
             this.show();
@@ -77,7 +82,7 @@ public class Game implements KeyListener {
      */
     private void repaint() {
         content.clear();
-        context.display(content);
+        screenContext.display(content);
         window.repaint();
     }
 
@@ -100,7 +105,7 @@ public class Game implements KeyListener {
      */
     @Override
     public void keyPressed(KeyEvent event) {
-        context = context.respond(event);
+        screenContext = screenContext.respond(event);
         this.repaint();
     }
 
@@ -112,6 +117,30 @@ public class Game implements KeyListener {
      */
     @Override
     public void keyReleased(KeyEvent e) {
+        //Do nothing
+    }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        //FIXME Make this easier to do
+        //FIXME: Need to make this in Box counts on grid, not pixels
+        ((ResizeableScreen) screenContext).setHeight(e.getComponent().getHeight());
+        ((ResizeableScreen) screenContext).setWidth(e.getComponent().getWidth());
+        this.repaint();
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+        //Do nothing
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+        //Do nothing
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
         //Do nothing
     }
 

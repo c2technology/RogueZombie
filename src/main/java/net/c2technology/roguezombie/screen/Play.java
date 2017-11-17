@@ -42,11 +42,11 @@ import net.c2technology.roguezombie.world.los.FieldOfView;
  *
  * @author cryan
  */
-public class Play implements Screen {
+public class Play extends ResizeableScreen {
 
     private final World world;
-    private final int screenWidth;
-    private final int screenHeight;
+    private int screenWidth;
+    private int screenHeight;
     private final FieldOfView fieldOfView;
     private final ClutterFactory clutterFactory;
     private final Player player;
@@ -57,11 +57,14 @@ public class Play implements Screen {
 
     /**
      * Default constructor
+     *
+     * @param height the height of the visible world in coordinates (not pixels)
+     * @param width the width of the visible world in coordinates (not pixels)
      */
-    public Play() {
-        //TODO: Take screen size as parameters? Could make the underlying World it proportional to the visible screen size...
-        this.screenWidth = 80;
-        this.screenHeight = 21;
+    public Play(int height, int width) {
+        super(height, width);
+        this.screenWidth = width;
+        this.screenHeight = height;
         clutterFactory = new ClutterFactory();
         world = createWorld();
         fieldOfView = new FieldOfView(world);
@@ -169,7 +172,7 @@ public class Play implements Screen {
     @Override
     public Screen respond(KeyEvent key) {
         if (!player.hasHealth()) {
-            return new Lose();
+            return new Lose(getHeight(), getWidth());
         }
 
         switch (key.getKeyCode()) {
@@ -223,9 +226,9 @@ public class Play implements Screen {
                 return this;
 
             case KeyEvent.VK_Q:
-                return new Lose();
+                return new Lose(getHeight(), getWidth());
             case KeyEvent.VK_W:
-                return new Win();
+                return new Win(getHeight(), getWidth());
             default:
                 //don't do anything if an unknown key was pressed
                 return this;
@@ -233,7 +236,7 @@ public class Play implements Screen {
         world.endTurn();
         if (onExit()) {
             if (isExitEligible()) {
-                return new Win();
+                return new Win(getHeight(), getWidth());
             }
             player.notify("Hmmm... I can't leave without the President....");
         }
@@ -315,5 +318,15 @@ public class Play implements Screen {
             terminal.writeCenter(globalMessageQueue.get(i), top + i);
         }
         globalMessageQueue.clear();
+    }
+
+    @Override
+    public void setWidth(int width) {
+        this.screenWidth = width;
+    }
+
+    @Override
+    public void setHeight(int height) {
+        this.screenHeight = height;
     }
 }

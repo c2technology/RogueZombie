@@ -27,7 +27,11 @@ import java.awt.event.KeyEvent;
  *
  * @author cryan
  */
-public class Start implements Screen {
+public class Start extends ResizeableScreen {
+
+    public Start(int height, int width) {
+        super(height, width);
+    }
 
     /**
      * Displays the instructions to the user.
@@ -58,7 +62,7 @@ public class Start implements Screen {
      */
     @Override
     public Screen respond(KeyEvent key) {
-        return key.getKeyCode() == KeyEvent.VK_ENTER ? new Play() : this;
+        return key.getKeyCode() == KeyEvent.VK_ENTER ? new Play(getHeight(), getWidth()) : this;
     }
 
 }

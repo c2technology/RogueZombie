@@ -28,7 +28,11 @@ import java.awt.event.KeyEvent;
  *
  * @author cryan
  */
-public class Lose implements Screen {
+public class Lose extends ResizeableScreen {
+
+    public Lose(int height, int width) {
+        super(height, width);
+    }
 
     /**
      * Writes out information related to the lost game.
@@ -59,7 +63,7 @@ public class Lose implements Screen {
      */
     @Override
     public Screen respond(KeyEvent key) {
-        return key.getKeyCode() == KeyEvent.VK_ENTER ? new Start() : this;
+        return key.getKeyCode() == KeyEvent.VK_ENTER ? new Start(getHeight(), getWidth()) : this;
     }
 
 }
